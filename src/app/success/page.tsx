@@ -1,7 +1,7 @@
 'use client';
 
 import { RocketIcon } from '@radix-ui/react-icons';
-import { Callout, Flex, Heading } from '@radix-ui/themes';
+import { Callout, Flex, Heading, Em } from '@radix-ui/themes';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -36,8 +36,8 @@ export default function Page() {
                             <RocketIcon />
                         </Callout.Icon>
                         <Callout.Text>
-                            Your Order is authorized! You'll be redirected to
-                            the checkout soon.
+                            Thank you for your payment! You'll be redirected to
+                            the checkout soon to pay <Em>even more!</Em>
                         </Callout.Text>
                     </Callout.Root>
                 </Flex>

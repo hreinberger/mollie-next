@@ -12,8 +12,9 @@ import {
     Table,
 } from '@radix-ui/themes';
 
-// Next logic
+// Next and React logic
 import { redirect } from 'next/navigation';
+import React from 'react';
 
 // Lib
 import { validateFormData, validateUrl } from '@/app/lib/validation';
@@ -22,6 +23,7 @@ import { mollieCreatePayment } from '@/app/lib/mollie';
 // Form components
 import CheckoutButton from './checkoutbutton';
 import PaymentMethods from './paymentmethods';
+import MethodSwitch from './switch';
 
 export default async function CheckoutForm() {
     // This Server Action takes the form data, validates it and creates a payment
@@ -324,7 +326,7 @@ export default async function CheckoutForm() {
                         >
                             Payment
                         </Heading>
-                        <PaymentMethods />
+                        <MethodSwitch prop={PaymentMethods()} />
                     </Flex>
                 </Grid>
                 <Flex
