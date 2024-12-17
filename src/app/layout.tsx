@@ -5,6 +5,7 @@ import { Theme, ThemePanel, Container, Section } from '@radix-ui/themes';
 import Navbar from '@/app/components/ui/navbar.js';
 import Footer from '@/app/components/ui/footer.js';
 import { Providers } from '@/app/components/ui/providers.jsx';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
     title: 'Mollie Demo App',
@@ -53,6 +54,10 @@ export default function RootLayout({
                         </Container>
                     </Theme>
                 </Providers>
+                <Script
+                    src="https://js.mollie.com/v1/mollie.js"
+                    strategy="lazyOnload"
+                />
             </body>
         </html>
     );

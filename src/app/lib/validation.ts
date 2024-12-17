@@ -56,3 +56,8 @@ export async function validateMolliePayment(id: string) {
         throw new Error(`No valid Mollie payment ID.`);
     }
 }
+
+// types
+
+// type for checkout variant
+export type checkoutVariant = 'hosted' | 'components';

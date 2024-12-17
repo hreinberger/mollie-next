@@ -308,3 +308,21 @@
 
 @tailwind components;
 @tailwind utilities;
+
+/* Styling for Mollie Components. We can use tailwind classes with @apply */
+
+.mollie-component {
+    @apply m-2 border rounded-md p-2 shadow-sm;
+    background-color: var(--color-surface);
+    height: var(--text-field-height);
+    border-color: var(--gray-indicator);
+}
+
+.has-focus {
+    @apply border;
+    border-color: var(--blue-9);
+}
+
+.mollie-card-component__error {
+    @apply text-red-600 m-2 font-mono text-sm;
+}

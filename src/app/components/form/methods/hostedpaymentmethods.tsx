@@ -14,7 +14,7 @@ import PaymentLogo from '@/app/components/form/paymentlogo';
 
 import { mollieGetMethods } from '@/app/lib/mollie';
 
-export default async function PaymentMethods() {
+export default async function HostedPaymentMethods() {
     const methods = await mollieGetMethods();
 
     return (
