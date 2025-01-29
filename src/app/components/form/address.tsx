@@ -158,7 +158,7 @@ export default async function Address() {
                 >
                     <Flex
                         gap="2"
-                        direction="column"
+                        direction="row"
                     >
                         <Switch
                             defaultChecked
