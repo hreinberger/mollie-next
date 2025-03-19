@@ -186,3 +186,49 @@ export async function mollieCapturePayment(id: string) {
     });
     return capture;
 }
+
+export async function mollieCreateSession() {
+    const session = await fetch('https://api.mollie.com/v2/sessions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + apiKey,
+        },
+        body: JSON.stringify({
+            amount: {
+                value: '10.00',
+                currency: 'EUR',
+            },
+        }),
+    });
+
+    const { id, clientAccessToken } = await session.json();
+    return { sessionId: id, clientAccessToken: clientAccessToken };
+}
+
+export async function mollieCreateSessionPayment(sessionId: string) {
+    const payment = await fetch(
+        `https://api.mollie.com/v2/sessions/${sessionId}/payments`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + apiKey,
+            },
+            body: JSON.stringify({
+                description: 'Test Express Payment',
+                amount: {
+                    value: '10.00',
+                    currency: 'EUR',
+                },
+                redirectUrl: domain + '/success',
+            }),
+        }
+    );
+    if (!payment.ok) {
+        console.error(payment);
+        throw new Error('Failed to create session payment');
+    } else {
+        return payment;
+    }
+}
