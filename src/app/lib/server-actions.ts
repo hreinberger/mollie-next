@@ -2,7 +2,10 @@
 
 // Lib
 import { validateFormData, validateUrl } from '@/app/lib/validation';
-import { mollieCreatePayment, mollieGetMethods } from '@/app/lib/mollie';
+import {
+    mollieCreatePayment,
+    mollieCreateSessionPayment,
+} from '@/app/lib/mollie';
 import { PaymentMethod, CaptureMethod } from '@mollie/api-client';
 
 // Next.js
@@ -39,4 +42,15 @@ export async function createPayment(formData: FormData) {
 
     // redirect to Mollie hosted checkout
     redirect(validatedRedirectUrl);
+}
+
+export async function createSessionPayment(sessionId: string) {
+    try {
+        const payment = await mollieCreateSessionPayment(sessionId);
+        console.log('Payment created successfully:', payment);
+        return;
+    } catch (error) {
+        console.error('Error creating session payment:', error);
+        throw new Error('Failed to create session payment');
+    }
 }
