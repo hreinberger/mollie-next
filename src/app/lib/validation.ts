@@ -25,7 +25,10 @@ export async function validateFormData(formData: FormData) {
             .string()
             .min(1, { message: 'Must be at least 1 character long.' }),
         country: z.string().toUpperCase().length(2),
-        payment_method: z.nativeEnum(PaymentMethod),
+        payment_method: z.union([
+            z.nativeEnum(PaymentMethod),
+            z.literal('paybybank'), // paybybank is not available in the mollie API client yet
+        ]),
         cardToken: z.string().startsWith('tkn_').optional(),
         captureMode: z.nativeEnum(CaptureMethod).optional(),
         currency: z.string().length(3),

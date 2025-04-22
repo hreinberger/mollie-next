@@ -56,26 +56,21 @@ export async function mollieCreatePayment({
     captureMode,
     currency,
 }: CreatePaymentParams) {
-    // we need to construct the billingAdress object first as long as this isn't fixed:
-    // https://github.com/mollie/mollie-api-node/issues/390#issuecomment-2467604847
-    // Update 2025-03-04: The original issue is fixed, but organizationName is still not supported
-    // https://github.com/mollie/mollie-api-node/issues/410
-    const billingAddress = {
-        givenName: firstname,
-        familyName: lastname,
-        organizationName: company,
-        streetAndNumber: address,
-        postalCode: zip_code,
-        city: city,
-        country: country,
-        email: email,
-    };
-
     // set up the actual payment with mollie library
     const payment: Payment = await mollieClient.payments.create({
         amount: {
             currency: currency,
             value: '220.00',
+        },
+        billingAddress: {
+            givenName: firstname,
+            familyName: lastname,
+            organizationName: company,
+            streetAndNumber: address,
+            postalCode: zip_code,
+            city: city,
+            country: country,
+            email: email,
         },
         metadata: {
             internal_payment_id: 'mollie-next-' + Date.now(),
@@ -127,7 +122,6 @@ export async function mollieCreatePayment({
         cancelUrl: domain,
         webhookUrl: webhookUrl,
         method: payment_method,
-        ...{ billingAddress },
         cardToken: cardToken,
         captureMode: captureMode,
         locale: getLocaleForCountry(country),
