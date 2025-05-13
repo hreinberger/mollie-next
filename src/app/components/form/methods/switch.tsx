@@ -6,6 +6,7 @@ import React, { Suspense } from 'react';
 
 import MethodsSkeleton from './methodskeleton';
 import ComponentPaymentMethods from './componentpaymentmethods';
+import SessionWrapper from '@/app/express/components/SessionWrapper';
 
 import { CheckoutVariant } from '@/app/lib/types';
 
@@ -13,10 +14,15 @@ export default function MethodSwitch({
     hostedmethods,
     variant,
     onClick,
+    session,
 }: {
     hostedmethods: React.ReactNode;
     variant: CheckoutVariant;
     onClick: (value: string) => void;
+    session: {
+        id: string;
+        clientAccessToken: string;
+    };
 }) {
     // Use React State to switch between hosted and component payment methods
     // If the State is switched to 'hosted', the HostedPaymentMethods server component is rendered
@@ -43,7 +49,9 @@ export default function MethodSwitch({
                 </Suspense>
             ) : (
                 <Suspense fallback={MethodsSkeleton()}>
-                    <ComponentPaymentMethods />
+                    <SessionWrapper session={session} />
+
+                    {<ComponentPaymentMethods />}
                 </Suspense>
             )}
         </>
