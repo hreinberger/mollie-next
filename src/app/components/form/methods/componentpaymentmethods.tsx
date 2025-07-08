@@ -13,7 +13,7 @@ import {
     Switch,
 } from '@radix-ui/themes';
 
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useMollie } from '@/app/lib/MollieContext';
 import { IdCardIcon } from '@radix-ui/react-icons';
 import PaymentLogo from '@/app/components/form/paymentlogo';

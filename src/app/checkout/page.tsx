@@ -6,6 +6,10 @@ import Address from '../components/form/address';
 import HostedPaymentMethods from '../components/form/methods/hostedpaymentmethods';
 import MethodsSkeleton from '../components/form/methods/methodskeleton';
 
+// session handling for Express Components
+import { mollieCreateSession } from '../lib/mollie';
+import { ExpressSession } from '../lib/types';
+
 // React components
 import { Suspense } from 'react';
 
@@ -28,6 +32,11 @@ export default async function Page(props: {
     const validatedCurrency = await validateCurrency(currency);
     const validatedCountry = await validateCountry(country);
 
+    const { sessionId, clientAccessToken } = await mollieCreateSession(
+        validatedCurrency
+    );
+    const session: ExpressSession = { id: sessionId, clientAccessToken };
+
     return (
         <main>
             <CheckoutForm
@@ -44,6 +53,7 @@ export default async function Page(props: {
                         />
                     </Suspense>
                 }
+                session={session}
             />
         </main>
     );
