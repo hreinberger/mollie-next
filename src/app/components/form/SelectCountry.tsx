@@ -87,6 +87,13 @@ export default function SelectCountry() {
                         >
                             🇮🇹 Italy
                         </Select.Item>
+                        <Select.Item
+                            value="ES"
+                            id="ES"
+                            aria-label="Spain"
+                        >
+                            🇪🇸 Spain
+                        </Select.Item>
                     </Select.Group>
                     <Select.Group>
                         <Select.Label>Other currencies</Select.Label>
