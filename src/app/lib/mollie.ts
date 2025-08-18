@@ -30,6 +30,7 @@ const countryToLocale: Record<string, Locale> = {
     PT: Locale.pt_PT,
     IT: Locale.it_IT,
     CH: Locale.de_CH,
+    ES: Locale.es_ES,
 };
 
 // function to get the locale for a given country
