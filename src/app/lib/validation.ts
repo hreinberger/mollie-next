@@ -1,7 +1,8 @@
 'use server';
 
 import { z } from 'zod';
-import { CaptureMethod, PaymentMethod } from '@mollie/api-client';
+import { CaptureMethod } from '@mollie/api-client';
+import { ExtendedPaymentMethod } from './types';
 
 export async function validateFormData(formData: FormData) {
     const form = Object.fromEntries(formData.entries());
@@ -14,7 +15,7 @@ export async function validateFormData(formData: FormData) {
             .string()
             .min(1, { message: 'Must be at least 1 character long.' }),
         company: z.string().optional(),
-        email: z.string().email({ message: 'Must be valid email address.' }),
+        email: z.email({ message: 'Must be valid email address.' }),
         address: z
             .string()
             .min(1, { message: 'Must be at least 1 character long.' }),
@@ -25,9 +26,9 @@ export async function validateFormData(formData: FormData) {
             .string()
             .min(1, { message: 'Must be at least 1 character long.' }),
         country: z.string().toUpperCase().length(2),
-        payment_method: z.nativeEnum(PaymentMethod),
+        payment_method: ExtendedPaymentMethod,
         cardToken: z.string().startsWith('tkn_').optional(),
-        captureMode: z.nativeEnum(CaptureMethod).optional(),
+        captureMode: z.enum(CaptureMethod).optional(),
         currency: z.string().length(3),
     });
 
@@ -40,7 +41,7 @@ export async function validateFormData(formData: FormData) {
 }
 
 export async function validateUrl(url: string) {
-    const urlSchema = z.string().url();
+    const urlSchema = z.url();
     try {
         const result = urlSchema.parse(url);
         return result;

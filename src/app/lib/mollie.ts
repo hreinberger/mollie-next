@@ -5,6 +5,7 @@ import createMollieClient, {
     Payment,
     SequenceType,
     PaymentLineCategory,
+    PaymentMethod,
 } from '@mollie/api-client';
 import { CreatePaymentParams } from './types';
 
@@ -30,6 +31,7 @@ const countryToLocale: Record<string, Locale> = {
     PT: Locale.pt_PT,
     IT: Locale.it_IT,
     CH: Locale.de_CH,
+    ES: Locale.es_ES,
 };
 
 // function to get the locale for a given country
@@ -56,6 +58,10 @@ export async function mollieCreatePayment({
     captureMode,
     currency,
 }: CreatePaymentParams) {
+    // Note: We allow beta payment methods to be sent to the API
+    // The Mollie API will handle validation and return appropriate errors if needed
+    // This allows testing of beta payment methods that aren't in the TypeScript client yet
+
     // set up the actual payment with mollie library
     const payment: Payment = await mollieClient.payments.create({
         amount: {
@@ -121,7 +127,7 @@ export async function mollieCreatePayment({
         redirectUrl: domain + '/success',
         cancelUrl: domain,
         webhookUrl: webhookUrl,
-        method: payment_method,
+        method: payment_method as any, // Allow beta payment methods to be sent to API
         cardToken: cardToken,
         captureMode: captureMode,
         locale: getLocaleForCountry(country),
