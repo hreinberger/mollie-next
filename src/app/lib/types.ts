@@ -1,5 +1,17 @@
 import { ReactNode } from 'react';
 import { CaptureMethod, PaymentMethod } from '@mollie/api-client';
+import { z } from 'zod';
+
+// Extended payment methods to include beta/testing methods
+export const ExtendedPaymentMethod = z.enum([
+    ...Object.values(PaymentMethod),
+    // Add beta payment methods here for testing
+    'bizum',
+    'vippsmobilepay',
+] as const);
+
+// Export the type for use in other files
+export type ExtendedPaymentMethodType = z.infer<typeof ExtendedPaymentMethod>;
 
 // Mollie Context types
 export type MollieInstance = {
@@ -28,7 +40,7 @@ export type CreatePaymentParams = {
     city: string;
     zip_code: string;
     country: string;
-    payment_method: PaymentMethod;
+    payment_method: ExtendedPaymentMethodType;
     cardToken?: string;
     captureMode?: CaptureMethod;
     currency: string;

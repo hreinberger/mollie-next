@@ -2,6 +2,7 @@
 
 // Lib
 import { validateFormData, validateUrl } from '@/app/lib/validation';
+import { ExtendedPaymentMethodType } from '@/app/lib/types';
 import { mollieCreatePayment, mollieGetMethods } from '@/app/lib/mollie';
 import { PaymentMethod, CaptureMethod } from '@mollie/api-client';
 
@@ -20,7 +21,7 @@ export async function createPayment(formData: FormData) {
         city: string;
         zip_code: string;
         country: string;
-        payment_method: PaymentMethod;
+        payment_method: ExtendedPaymentMethodType;
         cardToken?: string;
         captureMode?: CaptureMethod;
         currency: string;
