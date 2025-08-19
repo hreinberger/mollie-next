@@ -40,21 +40,28 @@ export const MollieProvider = ({ children }: MollieProviderProps) => {
                 setMollie(mollieRef.current);
             }
         };
-
+        loadMollie();
         // Load the Mollie script
-        if (typeof window !== 'undefined' && !window.Mollie) {
-            const script = document.createElement('script');
-            script.src = 'https://js.mollie.com/v1/mollie.js';
-            script.async = true;
-            script.onload = loadMollie;
-            document.body.appendChild(script);
+        // Only load Mollie if it's not already available
+        // if (typeof window !== 'undefined') {
+        //     if (!window.Mollie) {
+        //         const script = document.createElement('script');
+        //         script.src = 'https://js.mollie.com/v1/mollie.js';
+        //         script.async = true;
+        //         script.onload = loadMollie;
+        //         document.body.appendChild(script);
 
-            return () => {
-                document.body.removeChild(script);
-            };
-        } else {
-            loadMollie();
-        }
+        //         // Return cleanup function to remove script when component unmounts
+        //         return () => {
+        //             if (script.parentNode) {
+        //                 document.body.removeChild(script);
+        //             }
+        //         };
+        //     } else {
+        //         // If Mollie is already available, just initialize it
+        //         loadMollie();
+        //     }
+        // }
 
         // Cleanup function to unload Mollie object
         return () => {
@@ -76,13 +83,3 @@ export const MollieProvider = ({ children }: MollieProviderProps) => {
 export const useMollie = (): MollieContextType => {
     return useContext(MollieContext);
 };
-
-// Declare the Mollie global type
-declare global {
-    interface Window {
-        Mollie: (
-            profileId: string,
-            options: { locale: string; testmode: boolean }
-        ) => MollieInstance;
-    }
-}
