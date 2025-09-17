@@ -66,7 +66,7 @@ export async function mollieCreatePayment({
     const payment: Payment = await mollieClient.payments.create({
         amount: {
             currency: currency,
-            value: '220.00',
+            value: '200.00',
         },
         billingAddress: {
             givenName: firstname,
@@ -192,4 +192,62 @@ export async function mollieCapturePayment(id: string) {
         paymentId: id,
     });
     return capture;
+}
+
+export async function mollieCreateSession(currency: string = 'EUR') {
+    try {
+        const session = await fetch('https://api.mollie.com/v2/sessions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + apiKey,
+            },
+            body: JSON.stringify({
+                description: 'Order #1234',
+                amount: {
+                    value: '1.00',
+                    currency: 'EUR',
+                },
+                redirectUrl: domain + '/success',
+            }),
+        });
+
+        if (!session.ok) {
+            throw new Error(
+                `Failed to create session: ${session.status} ${session.statusText}`
+            );
+        }
+
+        const { id, clientAccessToken } = await session.json();
+        return { sessionId: id, clientAccessToken: clientAccessToken };
+    } catch (error) {
+        console.error('Error creating Mollie session:', error);
+        throw error;
+    }
+}
+
+export async function mollieCreateSessionPayment(sessionId: string) {
+    const payment = await fetch(
+        `https://api.mollie.com/v2/sessions/${sessionId}/payments`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + apiKey,
+            },
+            body: JSON.stringify({
+                description: 'Test Express Payment',
+                amount: {
+                    value: '1.00',
+                    currency: 'EUR',
+                },
+            }),
+        }
+    );
+    if (!payment.ok) {
+        console.error(payment);
+        throw new Error('Failed to create session payment');
+    } else {
+        return payment;
+    }
 }
