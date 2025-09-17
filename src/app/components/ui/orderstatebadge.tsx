@@ -1,7 +1,7 @@
 import { Badge } from '@radix-ui/themes';
 import { JSX } from 'react';
 
-export default async function StateBadge(props: { state: string }) {
+export default function StateBadge(props: { state: string }) {
     let state: string = props.state;
     let result: JSX.Element = <Badge color="gray">{state}</Badge>;
 

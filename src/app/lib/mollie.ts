@@ -143,6 +143,13 @@ export async function mollieGetPayments() {
     return payments;
 }
 
+// only get the latest payment
+
+export async function mollieGetLatestPaymentStatus() {
+    const payment = await mollieClient.payments.page({ limit: 1 });
+    return payment[0].status;
+}
+
 // Get a specific payment by its ID
 
 export async function mollieGetPayment(id: string) {

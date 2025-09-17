@@ -1,10 +1,12 @@
 'use client';
 
 import { RocketIcon } from '@radix-ui/react-icons';
-import { Callout, Flex, Heading, Em } from '@radix-ui/themes';
+import { Callout, Flex, Heading, Em, Badge } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { mollieGetLatestPaymentStatus } from '../lib/mollie';
+import StateBadge from '../components/ui/orderstatebadge';
 
 // Dynamically import the confetti component to avoid SSR issues
 const ReactConfetti = dynamic(() => import('react-confetti'), { ssr: false });
@@ -16,6 +18,16 @@ export default function Page() {
         width: typeof window !== 'undefined' ? window.innerWidth : 0,
         height: typeof window !== 'undefined' ? window.innerHeight : 0,
     });
+    const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+
+    // Fetch payment status
+    useEffect(() => {
+        async function getStatus() {
+            const status = await mollieGetLatestPaymentStatus();
+            setPaymentStatus(status);
+        }
+        getStatus();
+    }, []);
 
     // Green color palette for confetti
     const greenColors = [
@@ -42,20 +54,20 @@ export default function Page() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Stop confetti after 6.5 seconds
+    // Stop confetti after 9.5 seconds
     useEffect(() => {
         const confettiTimer = setTimeout(() => {
             setShowConfetti(false);
-        }, 6500);
+        }, 9500);
 
         return () => clearTimeout(confettiTimer);
     }, []);
 
-    // Redirect to checkout after 7 seconds
+    // Redirect to checkout after 10 seconds
     useEffect(() => {
         const timer = setTimeout(() => {
             router.push('/checkout');
-        }, 7000);
+        }, 10000);
 
         return () => clearTimeout(timer);
     }, [router]);
@@ -78,7 +90,17 @@ export default function Page() {
                 direction="column"
                 m="6"
             >
-                <Heading>Success</Heading>
+                <Heading>Thank You for your order!</Heading>
+                <Flex
+                    align="center"
+                    mt="2"
+                    gap="2"
+                >
+                    Your payment status is:{' '}
+                    {paymentStatus && (
+                        <StateBadge state={paymentStatus || 'loading...'} />
+                    )}
+                </Flex>
                 <Flex
                     align="center"
                     justify="center"
@@ -92,7 +114,7 @@ export default function Page() {
                             <RocketIcon />
                         </Callout.Icon>
                         <Callout.Text>
-                            Thank you for your payment! You'll be redirected to
+                            Thank you for your order! You'll be redirected to
                             the checkout soon to pay <Em>even more!</Em>
                         </Callout.Text>
                     </Callout.Root>
