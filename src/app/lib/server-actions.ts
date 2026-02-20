@@ -7,6 +7,7 @@ import {
     mollieCreateSessionPayment,
 } from '@/app/lib/mollie';
 import { PaymentMethod, CaptureMethod } from '@mollie/api-client';
+import { ExtendedPaymentMethodType } from '@/app/lib/types';
 
 // Next.js
 import { redirect } from 'next/navigation';
