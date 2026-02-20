@@ -6,7 +6,7 @@ import React, { Suspense } from 'react';
 
 import MethodsSkeleton from './methodskeleton';
 import ComponentPaymentMethods from './componentpaymentmethods';
-import SessionWrapper from '@/app/express/components/SessionWrapper';
+import SessionWrapper from '@/app/components/form/methods/SessionWrapper';
 
 import { CheckoutVariant } from '@/app/lib/types';
 

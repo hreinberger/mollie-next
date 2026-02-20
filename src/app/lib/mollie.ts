@@ -10,6 +10,7 @@ import createMollieClient, {
 import { CreatePaymentParams } from './types';
 
 const apiKey = process.env.MOLLIE_API_KEY;
+const liveApiKey = process.env.MOLLIE_LIVE_API_KEY;
 const domain = process.env.DOMAIN || 'http://localhost:3000';
 const webhookUrl = process.env.WEBHOOK_URL || 'http://not.provided';
 
@@ -24,6 +25,10 @@ function isValidSessionId(sessionId: string): boolean {
 
 if (!apiKey) {
     throw new Error('MOLLIE_API_KEY is not defined');
+}
+
+if (!liveApiKey) {
+    throw new Error('MOLLIE_LIVE_API_KEY is not defined');
 }
 
 // Set up Mollie API client
@@ -209,7 +214,7 @@ export async function mollieCreateSession(currency: string = 'EUR') {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + apiKey,
+                Authorization: 'Bearer ' + liveApiKey,
             },
             body: JSON.stringify({
                 description: 'Order #1234',
@@ -245,12 +250,12 @@ export async function mollieCreateSessionPayment(sessionId: string) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + apiKey,
+                Authorization: 'Bearer ' + liveApiKey,
             },
             body: JSON.stringify({
                 description: 'Test Express Payment',
                 amount: {
-                    value: '1.00',
+                    value: '0.10',
                     currency: 'EUR',
                 },
             }),

@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/lib/MollieContext.tsx",
-    "src/app/express/components/SessionWrapper.jsx",
+    "src/app/components/form/methods/SessionWrapper.jsx",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
