@@ -23,9 +23,14 @@ import ShoppingCart from './shoppingcart';
 export default function CheckoutForm({
     address,
     hostedmethods,
+    session,
 }: {
     address: React.ReactNode;
     hostedmethods: React.ReactNode;
+    session: {
+        id: string;
+        clientAccessToken: string;
+    };
 }) {
     // Use React State to switch between hosted and component payment methods
     const [checkoutVariant, setCheckoutVariant] =
@@ -68,6 +73,7 @@ export default function CheckoutForm({
                                     prev === 'hosted' ? 'components' : 'hosted'
                                 )
                             }
+                            session={session}
                         />
                     </Flex>
                 </Grid>

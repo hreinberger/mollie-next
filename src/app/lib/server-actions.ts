@@ -2,9 +2,12 @@
 
 // Lib
 import { validateFormData, validateUrl } from '@/app/lib/validation';
-import { ExtendedPaymentMethodType } from '@/app/lib/types';
-import { mollieCreatePayment, mollieGetMethods } from '@/app/lib/mollie';
+import {
+    mollieCreatePayment,
+    mollieCreateSessionPayment,
+} from '@/app/lib/mollie';
 import { PaymentMethod, CaptureMethod } from '@mollie/api-client';
+import { ExtendedPaymentMethodType } from '@/app/lib/types';
 
 // Next.js
 import { redirect } from 'next/navigation';
@@ -40,4 +43,12 @@ export async function createPayment(formData: FormData) {
 
     // redirect to Mollie hosted checkout
     redirect(validatedRedirectUrl);
+}
+
+// createSessionPayment is called by the Express Component (SessionWrapper) when
+// the user has selected a payment method and the SDK fires 'readyforpayment'.
+// Unlike createPayment, there is no redirect — the Express Component handles
+// the payment flow entirely on the client side after the payment is created.
+export async function createSessionPayment(sessionId: string) {
+    await mollieCreateSessionPayment(sessionId);
 }

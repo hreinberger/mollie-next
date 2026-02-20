@@ -40,23 +40,10 @@ export const MollieProvider = ({ children }: MollieProviderProps) => {
                 setMollie(mollieRef.current);
             }
         };
-
-        // Load the Mollie script
-        if (typeof window !== 'undefined' && !window.Mollie) {
-            const script = document.createElement('script');
-            script.src = 'https://js.mollie.com/v1/mollie.js';
-            script.async = true;
-            script.onload = loadMollie;
-            document.body.appendChild(script);
-
-            return () => {
-                document.body.removeChild(script);
-            };
-        } else {
-            loadMollie();
-        }
-
-        // Cleanup function to unload Mollie object
+        loadMollie();
+        // The Mollie v1 script is loaded globally via next/script in layout.tsx.
+        // We call loadMollie() directly here to initialize the Mollie object
+        // from window.Mollie once the component mounts.
         return () => {
             if (mollieRef.current) {
                 mollieRef.current = null;
@@ -76,13 +63,3 @@ export const MollieProvider = ({ children }: MollieProviderProps) => {
 export const useMollie = (): MollieContextType => {
     return useContext(MollieContext);
 };
-
-// Declare the Mollie global type
-declare global {
-    interface Window {
-        Mollie: (
-            profileId: string,
-            options: { locale: string; testmode: boolean }
-        ) => MollieInstance;
-    }
-}

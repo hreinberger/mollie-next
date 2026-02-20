@@ -30,6 +30,34 @@ export type MollieProviderProps = {
     children: ReactNode;
 };
 
+// Declare the Mollie and Mollie2 global types
+declare global {
+    interface Window {
+        // the "old" Mollie object for card components
+        Mollie: (
+            profileId: string,
+            options: { locale: string; testmode: boolean }
+        ) => MollieInstance;
+        // the new Mollie object for express components
+        Mollie2: (
+            clientAccessToken: string,
+            options: { locale: string }
+        ) => MollieExpressInstance;
+    }
+}
+
+// Define the structure for the object returned by Mollie2()
+export interface MollieExpressInstance {
+    create: (componentType: string) => MollieExpressComponent;
+}
+
+// Define the structure for the object returned by mollie.create()
+export interface MollieExpressComponent {
+    mount: (element: HTMLElement | string | null) => void;
+    unmount: () => void;
+    on: (event: string, callback: (data?: unknown) => void) => void;
+}
+
 // Mollie payment form types
 export type CreatePaymentParams = {
     firstname: string;
@@ -48,3 +76,9 @@ export type CreatePaymentParams = {
 
 // Checkout types
 export type CheckoutVariant = 'hosted' | 'components';
+
+// Express Session Type
+export type ExpressSession = {
+    id: string;
+    clientAccessToken: string;
+};
