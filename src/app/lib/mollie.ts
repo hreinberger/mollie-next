@@ -13,6 +13,15 @@ const apiKey = process.env.MOLLIE_API_KEY;
 const domain = process.env.DOMAIN || 'http://localhost:3000';
 const webhookUrl = process.env.WEBHOOK_URL || 'http://not.provided';
 
+// Validate that a sessionId has a safe format before using it in a URL path.
+// This prevents user-controlled data from arbitrarily changing the request URL.
+function isValidSessionId(sessionId: string): boolean {
+    // Allow only URL-safe characters and limit length to a reasonable maximum.
+    // Adjust the regex if Mollie session IDs have a stricter known format.
+    const SESSION_ID_REGEX = /^[A-Za-z0-9_-]{1,64}$/;
+    return SESSION_ID_REGEX.test(sessionId);
+}
+
 if (!apiKey) {
     throw new Error('MOLLIE_API_KEY is not defined');
 }
@@ -227,6 +236,9 @@ export async function mollieCreateSession(currency: string = 'EUR') {
 }
 
 export async function mollieCreateSessionPayment(sessionId: string) {
+    if (!isValidSessionId(sessionId)) {
+        throw new Error('Invalid sessionId format');
+    }
     const payment = await fetch(
         `https://api.mollie.com/v2/sessions/${sessionId}/payments`,
         {
