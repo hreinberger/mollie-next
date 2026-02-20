@@ -208,6 +208,10 @@ export async function mollieCapturePayment(id: string) {
     return capture;
 }
 
+// mollieCreateSession creates a Mollie Session, which is the starting point for
+// Express Components. The session returns a clientAccessToken that is passed to
+// the client-side Mollie2.Checkout() initializer in SessionWrapper.
+// Sessions use the live API key because Express Components only work in live mode.
 export async function mollieCreateSession(currency: string = 'EUR') {
     try {
         const session = await fetch('https://api.mollie.com/v2/sessions', {
@@ -220,7 +224,7 @@ export async function mollieCreateSession(currency: string = 'EUR') {
                 description: 'Order #1234',
                 amount: {
                     value: '0.10',
-                    currency: 'EUR',
+                    currency: currency,
                 },
                 redirectUrl: domain + '/success',
             }),
@@ -240,6 +244,9 @@ export async function mollieCreateSession(currency: string = 'EUR') {
     }
 }
 
+// mollieCreateSessionPayment creates a payment linked to an existing session.
+// This is called server-side when the Express Component fires 'readyforpayment',
+// signalling that the user has confirmed their payment method.
 export async function mollieCreateSessionPayment(sessionId: string) {
     if (!isValidSessionId(sessionId)) {
         throw new Error('Invalid sessionId format');
@@ -262,9 +269,9 @@ export async function mollieCreateSessionPayment(sessionId: string) {
         }
     );
     if (!payment.ok) {
-        console.error(payment);
-        throw new Error('Failed to create session payment');
-    } else {
-        return payment;
+        throw new Error(
+            `Failed to create session payment: ${payment.status} ${payment.statusText}`
+        );
     }
+    return payment;
 }

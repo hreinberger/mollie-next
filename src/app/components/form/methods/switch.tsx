@@ -59,8 +59,7 @@ export default function MethodSwitch({
                         </Callout.Text>
                     </Callout.Root>
                     <SessionWrapper session={session} />
-
-                    {<ComponentPaymentMethods />}
+                    <ComponentPaymentMethods />
                 </Suspense>
             )}
         </>

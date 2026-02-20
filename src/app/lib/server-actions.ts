@@ -45,13 +45,10 @@ export async function createPayment(formData: FormData) {
     redirect(validatedRedirectUrl);
 }
 
+// createSessionPayment is called by the Express Component (SessionWrapper) when
+// the user has selected a payment method and the SDK fires 'readyforpayment'.
+// Unlike createPayment, there is no redirect — the Express Component handles
+// the payment flow entirely on the client side after the payment is created.
 export async function createSessionPayment(sessionId: string) {
-    try {
-        const payment = await mollieCreateSessionPayment(sessionId);
-        console.log('Payment created successfully:', payment);
-        return;
-    } catch (error) {
-        console.error('Error creating session payment:', error);
-        throw new Error('Failed to create session payment');
-    }
+    await mollieCreateSessionPayment(sessionId);
 }

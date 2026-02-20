@@ -41,29 +41,9 @@ export const MollieProvider = ({ children }: MollieProviderProps) => {
             }
         };
         loadMollie();
-        // Load the Mollie script
-        // Only load Mollie if it's not already available
-        // if (typeof window !== 'undefined') {
-        //     if (!window.Mollie) {
-        //         const script = document.createElement('script');
-        //         script.src = 'https://js.mollie.com/v1/mollie.js';
-        //         script.async = true;
-        //         script.onload = loadMollie;
-        //         document.body.appendChild(script);
-
-        //         // Return cleanup function to remove script when component unmounts
-        //         return () => {
-        //             if (script.parentNode) {
-        //                 document.body.removeChild(script);
-        //             }
-        //         };
-        //     } else {
-        //         // If Mollie is already available, just initialize it
-        //         loadMollie();
-        //     }
-        // }
-
-        // Cleanup function to unload Mollie object
+        // The Mollie v1 script is loaded globally via next/script in layout.tsx.
+        // We call loadMollie() directly here to initialize the Mollie object
+        // from window.Mollie once the component mounts.
         return () => {
             if (mollieRef.current) {
                 mollieRef.current = null;

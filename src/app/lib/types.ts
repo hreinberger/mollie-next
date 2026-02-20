@@ -54,8 +54,8 @@ export interface MollieExpressInstance {
 // Define the structure for the object returned by mollie.create()
 export interface MollieExpressComponent {
     mount: (element: HTMLElement | string | null) => void;
-    unmount: () => void; // Assuming there's an unmount method based on SessionWrapper.jsx
-    on: (event: string, callback: (data?: any) => void) => void; // Assuming an 'on' method for events
+    unmount: () => void;
+    on: (event: string, callback: (data?: unknown) => void) => void;
 }
 
 // Mollie payment form types

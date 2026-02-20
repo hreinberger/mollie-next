@@ -8,7 +8,6 @@ import MollieLogo from './mollielogo';
 
 export default function Navbar() {
   const pathname = usePathname();
-  console.log('navigated to:' + pathname);
 
   return (
     <Flex
@@ -69,22 +68,6 @@ export default function Navbar() {
               )}
             >
               Payments
-            </Text>
-          </Link>
-          <Link href="/express">
-            <Text
-              size={{
-                initial: '1',
-                xs: '2',
-                md: '3',
-                xl: '4',
-              }}
-              className={clsx(
-                'transition-all duration-100',
-                pathname === '/express' ? 'font-bold' : 'font-medium'
-              )}
-            >
-              Express Component
             </Text>
           </Link>
           <Link
