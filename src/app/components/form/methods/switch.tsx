@@ -1,6 +1,7 @@
 'use client';
 
-import { SegmentedControl } from '@radix-ui/themes';
+import { SegmentedControl, Callout } from '@radix-ui/themes';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
 import React, { Suspense } from 'react';
 
@@ -49,6 +50,14 @@ export default function MethodSwitch({
                 </Suspense>
             ) : (
                 <Suspense fallback={MethodsSkeleton()}>
+                    <Callout.Root color="orange" size="1">
+                        <Callout.Icon>
+                            <ExclamationTriangleIcon />
+                        </Callout.Icon>
+                        <Callout.Text>
+                            Express payments are <strong>live payments</strong> and will charge your card.
+                        </Callout.Text>
+                    </Callout.Root>
                     <SessionWrapper session={session} />
 
                     {<ComponentPaymentMethods />}
