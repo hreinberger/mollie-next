@@ -38,3 +38,5 @@ next-env.d.ts
 
 # AI
 .github/instructions
+AGENTS.md
+copilot-instructions.md
