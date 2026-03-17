@@ -80,7 +80,7 @@ export async function mollieCreatePayment({
     const payment: Payment = await mollieClient.payments.create({
         amount: {
             currency: currency,
-            value: '200.00',
+            value: '220.00',
         },
         billingAddress: {
             givenName: firstname,
@@ -177,7 +177,7 @@ export async function mollieGetPayment(id: string) {
 
 export async function mollieGetMethods(
     currency: string = 'EUR',
-    country: string = 'DE'
+    country: string = 'DE',
 ) {
     let locale = Locale.en_US;
     locale = getLocaleForCountry(country);
@@ -187,7 +187,7 @@ export async function mollieGetMethods(
             ' ' +
             locale +
             ' ' +
-            currency
+            currency,
     );
     const methods = await mollieClient.methods.list({
         sequenceType: SequenceType.oneoff,
@@ -232,7 +232,7 @@ export async function mollieCreateSession(currency: string = 'EUR') {
 
         if (!session.ok) {
             throw new Error(
-                `Failed to create session: ${session.status} ${session.statusText}`
+                `Failed to create session: ${session.status} ${session.statusText}`,
             );
         }
 
@@ -266,11 +266,11 @@ export async function mollieCreateSessionPayment(sessionId: string) {
                     currency: 'EUR',
                 },
             }),
-        }
+        },
     );
     if (!payment.ok) {
         throw new Error(
-            `Failed to create session payment: ${payment.status} ${payment.statusText}`
+            `Failed to create session payment: ${payment.status} ${payment.statusText}`,
         );
     }
     return payment;
