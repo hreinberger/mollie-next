@@ -227,6 +227,20 @@ export async function mollieCreateSession(currency: string = 'EUR') {
                     currency: currency,
                 },
                 redirectUrl: domain + '/success',
+                lines: [
+                    {
+                        description: 'Demo Product',
+                        quantity: 1,
+                        unitPrice: {
+                            currency: currency,
+                            value: '0.10',
+                        },
+                        totalAmount: {
+                            currency: currency,
+                            value: '0.10',
+                        },
+                    },
+                ],
             }),
         });
 
