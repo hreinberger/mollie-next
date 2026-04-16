@@ -1,7 +1,7 @@
 'use client';
 
 import { SegmentedControl, Callout } from '@radix-ui/themes';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { ExclamationTriangleIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 
 import React, { Suspense } from 'react';
 
@@ -16,6 +16,7 @@ export default function MethodSwitch({
     variant,
     onClick,
     session,
+    showComponents,
 }: {
     hostedmethods: React.ReactNode;
     variant: CheckoutVariant;
@@ -24,6 +25,7 @@ export default function MethodSwitch({
         id: string;
         clientAccessToken: string;
     };
+    showComponents: boolean;
 }) {
     // Use React State to switch between hosted and component payment methods
     // If the State is switched to 'hosted', the HostedPaymentMethods server component is rendered
@@ -50,15 +52,28 @@ export default function MethodSwitch({
                 </Suspense>
             ) : (
                 <Suspense fallback={MethodsSkeleton()}>
-                    <Callout.Root color="orange" size="1">
-                        <Callout.Icon>
-                            <ExclamationTriangleIcon />
-                        </Callout.Icon>
-                        <Callout.Text>
-                            Express payments are <strong>live payments</strong> and will charge your card.
-                        </Callout.Text>
-                    </Callout.Root>
-                    <SessionWrapper session={session} />
+                    {showComponents ? (
+                        <>
+                            <Callout.Root color="orange" size="1">
+                                <Callout.Icon>
+                                    <ExclamationTriangleIcon />
+                                </Callout.Icon>
+                                <Callout.Text>
+                                    Express payments are <strong>live payments</strong> and will charge your card.
+                                </Callout.Text>
+                            </Callout.Root>
+                            <SessionWrapper session={session} />
+                        </>
+                    ) : (
+                        <Callout.Root color="blue" size="1">
+                            <Callout.Icon>
+                                <InfoCircledIcon />
+                            </Callout.Icon>
+                            <Callout.Text>
+                                Sign in with a Mollie account to use express checkout.
+                            </Callout.Text>
+                        </Callout.Root>
+                    )}
                     <ComponentPaymentMethods />
                 </Suspense>
             )}

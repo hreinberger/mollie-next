@@ -10,6 +10,9 @@ import MethodsSkeleton from '../components/form/methods/methodskeleton';
 import { mollieCreateSession } from '../lib/mollie';
 import { ExpressSession } from '../lib/types';
 
+// auth
+import { getSession } from '../lib/auth';
+
 // React components
 import { Suspense } from 'react';
 
@@ -32,10 +35,17 @@ export default async function Page(props: {
     const validatedCurrency = await validateCurrency(currency);
     const validatedCountry = await validateCountry(country);
 
-    const { sessionId, clientAccessToken } = await mollieCreateSession(
-        validatedCurrency
-    );
-    const session: ExpressSession = { id: sessionId, clientAccessToken };
+    const authSession = await getSession();
+    const showComponents = authSession?.isMollie === true;
+
+    // Only create a Mollie session for @mollie.com users — it uses the live API key
+    let expressSession: ExpressSession = { id: '', clientAccessToken: '' };
+    if (showComponents) {
+        const { sessionId, clientAccessToken } = await mollieCreateSession(
+            validatedCurrency
+        );
+        expressSession = { id: sessionId, clientAccessToken };
+    }
 
     return (
         <main>
@@ -53,7 +63,8 @@ export default async function Page(props: {
                         />
                     </Suspense>
                 }
-                session={session}
+                session={expressSession}
+                showComponents={showComponents}
             />
         </main>
     );
