@@ -24,6 +24,7 @@ export default function CheckoutForm({
     address,
     hostedmethods,
     session,
+    showComponents,
 }: {
     address: React.ReactNode;
     hostedmethods: React.ReactNode;
@@ -31,6 +32,7 @@ export default function CheckoutForm({
         id: string;
         clientAccessToken: string;
     };
+    showComponents: boolean;
 }) {
     // Use React State to switch between hosted and component payment methods
     const [checkoutVariant, setCheckoutVariant] =
@@ -74,6 +76,7 @@ export default function CheckoutForm({
                                 )
                             }
                             session={session}
+                            showComponents={showComponents}
                         />
                     </Flex>
                 </Grid>

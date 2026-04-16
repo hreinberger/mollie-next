@@ -4,5 +4,8 @@ declare namespace NodeJS {
     readonly MOLLIE_API_KEY: string;
     readonly MOLLIE_LIVE_API_KEY: string;
     readonly DOMAIN: string;
+    readonly GOOGLE_CLIENT_ID: string;
+    readonly GOOGLE_CLIENT_SECRET: string;
+    readonly AUTH_SECRET: string;
   }
 }

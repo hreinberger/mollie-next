@@ -8,17 +8,27 @@ import { Providers } from '@/app/components/ui/providers.jsx';
 import Script from 'next/script';
 
 import { MollieProvider } from './lib/MollieContext';
+import { getSession } from './lib/auth';
 
 export const metadata: Metadata = {
     title: 'Mollie Demo App',
-    description: 'A demo app for Mollie payments, written in next.js',
+    description: 'A demo app for Mollie payments',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const session = await getSession();
+    const user = session.email
+        ? {
+              name: session.name,
+              picture: session.picture,
+              isMollie: session.isMollie,
+          }
+        : null;
+
     return (
         <html
             lang="en"
@@ -39,7 +49,7 @@ export default function RootLayout({
                                 pt="0"
                                 pb="4"
                             >
-                                <Navbar />
+                                <Navbar user={user} />
                             </Section>
                             <Section
                                 pt="4"
