@@ -8,6 +8,7 @@ export const ExtendedPaymentMethod = z.enum([
     // Add beta payment methods here for testing
     'bizum',
     'vippsmobilepay',
+    'billink',
 ] as const);
 
 // Export the type for use in other files
