@@ -1,6 +1,7 @@
 'use server';
 
 import createMollieClient, {
+    CaptureMethod,
     Locale,
     Payment,
     SequenceType,
@@ -75,6 +76,11 @@ export async function mollieCreatePayment({
     // Note: We allow beta payment methods to be sent to the API
     // The Mollie API will handle validation and return appropriate errors if needed
     // This allows testing of beta payment methods that aren't in the TypeScript client yet
+
+    // Billink requires manual capture at all times
+    if (payment_method === 'billink') {
+        captureMode = CaptureMethod.manual;
+    }
 
     // set up the actual payment with mollie library
     const payment: Payment = await mollieClient.payments.create({
