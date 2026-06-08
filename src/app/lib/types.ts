@@ -76,7 +76,7 @@ export type CreatePaymentParams = {
 };
 
 // Checkout types
-export type CheckoutVariant = 'hosted' | 'components';
+export type CheckoutVariant = 'hosted' | 'components' | 'components-v2';
 
 // Express Session Type
 export type ExpressSession = {

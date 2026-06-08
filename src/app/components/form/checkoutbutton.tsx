@@ -50,7 +50,9 @@ export default function CheckoutButton({
             size="3"
             className="w-10/12 sm:w-6/12 lg:w-4/12"
             loading={pending}
-            formAction={variant === 'components' ? payWithToken : createPayment}
+            formAction={
+                    variant === 'components' ? payWithToken : createPayment
+                }
         >
             Buy Now
         </Button>

@@ -70,9 +70,9 @@ export default function CheckoutForm({
                         <MethodSwitch
                             variant={checkoutVariant}
                             hostedmethods={hostedmethods}
-                            onClick={() =>
-                                setCheckoutVariant((prev) =>
-                                    prev === 'hosted' ? 'components' : 'hosted'
+                            onVariantChange={(value) =>
+                                setCheckoutVariant(
+                                    value as CheckoutVariant
                                 )
                             }
                             session={session}
@@ -80,13 +80,15 @@ export default function CheckoutForm({
                         />
                     </Flex>
                 </Grid>
-                <Flex
-                    align="center"
-                    justify="center"
-                    mt="6"
-                >
-                    <CheckoutButton variant={checkoutVariant} />
-                </Flex>
+                {checkoutVariant !== 'components-v2' && (
+                    <Flex
+                        align="center"
+                        justify="center"
+                        mt="6"
+                    >
+                        <CheckoutButton variant={checkoutVariant} />
+                    </Flex>
+                )}
             </Flex>
         </form>
     );
