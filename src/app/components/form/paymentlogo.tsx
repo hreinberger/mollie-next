@@ -9,6 +9,7 @@ export default function PaymentLogo({ method }: { method: string }) {
             <Image
                 src={`https://mollie.com/external/icons/payment-methods/${method}.svg`}
                 alt={method}
+                title={method}
                 height={24}
                 width={32}
             />

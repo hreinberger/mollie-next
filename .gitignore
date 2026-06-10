@@ -40,3 +40,4 @@ next-env.d.ts
 .github/instructions
 AGENTS.md
 copilot-instructions.md
+CLAUDE.md
