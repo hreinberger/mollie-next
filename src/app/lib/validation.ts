@@ -70,6 +70,26 @@ export async function validateCurrency(currency: string) {
     }
 }
 
+export async function validateCaptureAmount(amount: string, max: string): Promise<string> {
+    const maxNum = parseFloat(max);
+    const schema = z
+        .string()
+        .regex(/^\d+(\.\d{1,2})?$/, { message: 'Must be a valid amount (e.g. 10.00)' })
+        .refine(
+            (s) => {
+                const n = parseFloat(s);
+                return n > 0 && n <= maxNum;
+            },
+            { message: `Amount must be between 0.01 and ${max}` },
+        )
+        .transform((s) => parseFloat(s).toFixed(2));
+    try {
+        return schema.parse(amount);
+    } catch (error) {
+        throw new Error(`Invalid capture amount: ${error}`);
+    }
+}
+
 export async function validateCountry(country: string) {
     const currencySchema = z.string().toUpperCase().length(2);
     try {

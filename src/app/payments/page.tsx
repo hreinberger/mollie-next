@@ -42,10 +42,10 @@ export default async function Page(props: {
                     prevCursor={previousPageCursor ?? null}
                 />
                 <div className="hidden md:block">
-                    <PaymentsTable payments={payments} />
+                    <PaymentsTable payments={payments} mode={mode} />
                 </div>
                 <div className="block md:hidden">
-                    <PaymentCards payments={payments} />
+                    <PaymentCards payments={payments} mode={mode} />
                 </div>
             </Flex>
         </main>

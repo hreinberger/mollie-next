@@ -5,7 +5,13 @@ import Link from 'next/link';
 import StateBadge from './orderstatebadge';
 import PaymentLogo from '../form/paymentlogo';
 
-export default function PaymentsTable({ payments }: { payments: Payment[] }) {
+export default function PaymentsTable({
+    payments,
+    mode = 'test',
+}: {
+    payments: Payment[];
+    mode?: 'test' | 'live';
+}) {
     return (
         <Flex justify="center" pt="4">
             <Table.Root
@@ -78,7 +84,7 @@ export default function PaymentsTable({ payments }: { payments: Payment[] }) {
                                     aria-label="Details"
                                     asChild
                                 >
-                                    <Link href={'/payments/' + payment.id}>
+                                    <Link href={`/payments/${payment.id}?mode=${mode}`}>
                                         <MagnifyingGlassIcon />
                                     </Link>
                                 </IconButton>
