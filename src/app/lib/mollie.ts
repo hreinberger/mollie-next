@@ -34,6 +34,7 @@ if (!liveApiKey) {
 
 // Set up Mollie API client
 const mollieClient = createMollieClient({ apiKey: apiKey });
+const livePaymentsClient = createMollieClient({ apiKey: liveApiKey! });
 
 // translate countries to locales
 const countryToLocale: Record<string, Locale> = {
@@ -156,11 +157,22 @@ export async function mollieCreatePayment({
     return redirectUrl;
 }
 
-// Get the last 10 payments made
-
-export async function mollieGetPayments() {
-    const payments = await mollieClient.payments.page({ limit: 10 });
-    return payments;
+export async function mollieGetPayments(opts: {
+    mode?: 'test' | 'live';
+    from?: string;
+    limit?: number;
+} = {}) {
+    const { mode = 'test', from, limit = 20 } = opts;
+    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const page = await client.payments.page({
+        limit,
+        ...(from ? { from } : {}),
+    });
+    return {
+        payments: Array.from(page),
+        nextPageCursor: page.nextPageCursor,
+        previousPageCursor: page.previousPageCursor,
+    };
 }
 
 // only get the latest payment
