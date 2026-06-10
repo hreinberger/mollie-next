@@ -182,10 +182,10 @@ export async function mollieGetLatestPaymentStatus() {
     return payment[0].status;
 }
 
-// Get a specific payment by its ID
-
-export async function mollieGetPayment(id: string) {
-    const payment = await mollieClient.payments.get(id);
+// Get a specific payment by its ID, with captures embedded
+export async function mollieGetPayment(id: string, mode: 'test' | 'live' = 'test') {
+    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const payment = await client.payments.get(id, { embed: ['captures', 'refunds'] } as any);
     return payment;
 }
 
@@ -216,14 +216,35 @@ export async function mollieGetMethods(
     });
     return methods;
 }
-// Capture a payment in full
-
-export async function mollieCapturePayment(id: string) {
+export async function mollieCapturePayment(
+    id: string,
+    mode: 'test' | 'live' = 'test',
+    amount?: { value: string; currency: string },
+) {
+    const client = mode === 'live' ? livePaymentsClient : mollieClient;
     console.debug('Capturing payment with id: ' + id);
-    const capture = await mollieClient.paymentCaptures.create({
+    const capture = await client.paymentCaptures.create({
         paymentId: id,
+        ...(amount ? { amount } : {}),
     });
     return capture;
+}
+
+export async function mollieReleaseAuthorization(
+    id: string,
+    mode: 'test' | 'live' = 'test',
+) {
+    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    return client.payments.releaseAuthorization(id);
+}
+
+export async function mollieRefundPayment(
+    id: string,
+    mode: 'test' | 'live' = 'test',
+    amount: { value: string; currency: string },
+) {
+    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    return client.paymentRefunds.create({ paymentId: id, amount });
 }
 
 // mollieCreateSession creates a Mollie Session, which is the starting point for

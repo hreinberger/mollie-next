@@ -4,12 +4,18 @@ import Link from 'next/link';
 import StateBadge from './orderstatebadge';
 import PaymentLogo from '../form/paymentlogo';
 
-export default function PaymentCards({ payments }: { payments: Payment[] }) {
+export default function PaymentCards({
+    payments,
+    mode = 'test',
+}: {
+    payments: Payment[];
+    mode?: 'test' | 'live';
+}) {
     return (
         <Flex direction="column" gap="3" pt="4">
             {payments.map((payment) => (
                 <Card key={payment.id} asChild>
-                    <Link href={`/payments/${payment.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Link href={`/payments/${payment.id}?mode=${mode}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                         <Flex justify="between" align="center">
                             <Flex align="center" gap="2">
                                 {payment.method && (
