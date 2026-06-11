@@ -8,7 +8,7 @@ import createMollieClient, {
     PaymentLineCategory,
     PaymentMethod,
 } from '@mollie/api-client';
-import { CreatePaymentParams } from './types';
+import { CreatePaymentParams, ALWAYS_AUTHORIZE_METHODS } from './types';
 
 const apiKey = process.env.MOLLIE_API_KEY;
 const liveApiKey = process.env.MOLLIE_LIVE_API_KEY;
@@ -78,8 +78,8 @@ export async function mollieCreatePayment({
     // The Mollie API will handle validation and return appropriate errors if needed
     // This allows testing of beta payment methods that aren't in the TypeScript client yet
 
-    // Billink requires manual capture at all times
-    if (payment_method === 'billink') {
+    // These methods always require manual capture regardless of client input
+    if (ALWAYS_AUTHORIZE_METHODS.includes(payment_method as any)) {
         captureMode = CaptureMethod.manual;
     }
 

@@ -1,17 +1,5 @@
-import {
-    Card,
-    Flex,
-    Separator,
-    Text,
-    Switch,
-    RadioCards,
-} from '@radix-ui/themes';
-
-import React from 'react';
-
-import PaymentLogo from '@/app/components/form/paymentlogo';
-
 import { mollieGetMethods } from '@/app/lib/mollie';
+import HostedPaymentMethodsInteractive from './hostedpaymentmethods-interactive';
 
 export default async function HostedPaymentMethodCards({
     currency,
@@ -22,60 +10,12 @@ export default async function HostedPaymentMethodCards({
 }) {
     const methods = await mollieGetMethods(currency, country);
 
-    return (
-        <>
-            <Card m="1">
-                <RadioCards.Root
-                    defaultValue={methods[0]?.id}
-                    name="payment_method"
-                    columns={{ initial: '1', sm: '2' }}
-                    size={{ initial: '1', sm: '2' }}
-                    mb="3"
-                >
-                    {methods.map((method) => (
-                        <React.Fragment key={method.id}>
-                            <RadioCards.Item
-                                value={method.id}
-                                aria-label={method.description}
-                            >
-                                <PaymentLogo method={method.id} />
-                                <Text>{method.description}</Text>
-                            </RadioCards.Item>
-                        </React.Fragment>
-                    ))}
-                </RadioCards.Root>
-                <Separator
-                    my="3"
-                    size="4"
-                />
-                <Flex>
-                    <Text
-                        as="label"
-                        size="2"
-                    >
-                        <Flex
-                            gap="2"
-                            direction="column"
-                        >
-                            <Flex gap="2">
-                                <Switch
-                                    radius="full"
-                                    name="captureMode"
-                                    value={'manual'}
-                                    aria-label="Capture mode"
-                                />
-                                Authorize payment (Cards and Klarna only)
-                            </Flex>
-                            <Text
-                                size="1"
-                                color="gray"
-                            >
-                                Authorized payments need to be captured later
-                            </Text>
-                        </Flex>
-                    </Text>
-                </Flex>
-            </Card>
-        </>
-    );
+    // Serialize to plain objects before crossing the Server/Client boundary.
+    // Mollie SDK returns class instances; only primitive fields can be passed as props.
+    const serialized = methods.map((m) => ({
+        id: m.id,
+        description: m.description,
+    }));
+
+    return <HostedPaymentMethodsInteractive methods={serialized} />;
 }
