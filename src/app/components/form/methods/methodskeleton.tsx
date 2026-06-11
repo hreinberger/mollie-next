@@ -1,11 +1,8 @@
 import {
     Card,
-    Flex,
-    Separator,
     Text,
     RadioCards,
     Skeleton,
-    Switch,
 } from '@radix-ui/themes';
 import React from 'react';
 
@@ -73,44 +70,6 @@ export default async function MethodsSkeleton() {
                         </React.Fragment>
                     ))}
                 </RadioCards.Root>
-                <Separator
-                    my="3"
-                    size="4"
-                />
-                <Flex>
-                    <Text
-                        as="label"
-                        size="2"
-                    >
-                        <Flex
-                            gap="2"
-                            direction="column"
-                        >
-                            <Flex gap="2">
-                                <Skeleton>
-                                    <Switch
-                                        radius="full"
-                                        name="captureMode"
-                                        value={'manual'}
-                                        aria-label="Capture mode"
-                                    />
-                                </Skeleton>
-                                <Skeleton>
-                                    Authorize payment (Cards and Klarna only)
-                                </Skeleton>
-                            </Flex>
-                            <Skeleton>
-                                <Text
-                                    size="1"
-                                    color="gray"
-                                >
-                                    Authorized payments need to be captured
-                                    later
-                                </Text>
-                            </Skeleton>
-                        </Flex>
-                    </Text>
-                </Flex>
             </Card>
         </>
     );

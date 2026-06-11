@@ -14,6 +14,18 @@ export const ExtendedPaymentMethod = z.enum([
 // Export the type for use in other files
 export type ExtendedPaymentMethodType = z.infer<typeof ExtendedPaymentMethod>;
 
+export const ALWAYS_AUTHORIZE_METHODS = ['billink', 'riverty'] as const;
+
+export const OPTIONALLY_AUTHORIZE_METHODS = [
+    'creditcard',
+    'klarna',
+    'billie',
+    'vipps',
+    'vippsmobilepay',
+    'mobilepay',
+    'paypal',
+] as const;
+
 // Mollie Context types
 export type MollieInstance = {
     createComponent: (type: string) => {
