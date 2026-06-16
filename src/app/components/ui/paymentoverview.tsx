@@ -4,6 +4,7 @@
 import {
     Flex,
     Box,
+    Button,
     Code,
     Card,
     DataList,
@@ -84,6 +85,9 @@ export default async function PaymentOverview({
         payment.status === 'paid' && parseFloat(remainingRefundable) > 0;
     const showRefundsSection =
         payment.status === 'paid' || refunds.length > 0;
+
+    const changePaymentStateUrl = (payment as any)._links?.changePaymentState?.href as string | undefined;
+    const canChangePaymentState = payment.status === 'pending' && !!changePaymentStateUrl;
 
     const billingAddress = (payment as any).billingAddress as
         | {
@@ -352,8 +356,8 @@ export default async function PaymentOverview({
                     </Card>
                 </Box>
 
-                {/* Right column: Captures + Refunds stacked */}
-                {(showCapturesSection || showRefundsSection) && (
+                {/* Right column: Captures + Refunds + Change Payment State stacked */}
+                {(showCapturesSection || showRefundsSection || canChangePaymentState) && (
                     <Flex
                         direction="column"
                         gap="4"
@@ -498,6 +502,23 @@ export default async function PaymentOverview({
                                         </Text>
                                     </Box>
                                 )}
+                            </Card>
+                        )}
+
+                        {/* Change Payment State card */}
+                        {canChangePaymentState && (
+                            <Card>
+                                <Heading size="3" mb="3">
+                                    Payment State
+                                </Heading>
+                                <Separator my="3" size="4" />
+                                <Flex justify="end">
+                                    <Button variant="soft" asChild>
+                                        <a href={changePaymentStateUrl}>
+                                            Change Payment State
+                                        </a>
+                                    </Button>
+                                </Flex>
                             </Card>
                         )}
 
