@@ -9,6 +9,7 @@ export const ExtendedPaymentMethod = z.enum([
     'bizum',
     'vippsmobilepay',
     'billink',
+    'wero',
 ] as const);
 
 // Export the type for use in other files
