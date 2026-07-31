@@ -12,6 +12,9 @@ const nextConfig = {
             },
         ],
     },
+    experimental: {
+        useTypeScriptCli: true, // needed for Typescript 7 support
+    },
 };
 
 export default nextConfig;
