@@ -1,6 +1,6 @@
 'use client';
 
-import { SegmentedControl, Callout } from '@radix-ui/themes';
+import { Box, SegmentedControl, Callout } from '@radix-ui/themes';
 import { ExclamationTriangleIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 
 import React, { Suspense } from 'react';
@@ -9,8 +9,9 @@ import MethodsSkeleton from './methodskeleton';
 import ComponentPaymentMethods from './componentpaymentmethods';
 import SessionWrapper from '@/app/components/form/methods/SessionWrapper';
 import CardWrapperV2 from '@/app/components/form/methods/CardWrapperV2';
+import AddressSourceToggle from '@/app/components/form/AddressSourceToggle';
 
-import { CheckoutVariant } from '@/app/lib/types';
+import { CheckoutVariant, AddressSource } from '@/app/lib/types';
 
 export default function MethodSwitch({
     hostedmethods,
@@ -18,6 +19,9 @@ export default function MethodSwitch({
     onVariantChange,
     session,
     showComponents,
+    addressSource,
+    onAddressSourceChange,
+    addressSourcePending,
 }: {
     hostedmethods: React.ReactNode;
     variant: CheckoutVariant;
@@ -27,7 +31,15 @@ export default function MethodSwitch({
         clientAccessToken: string;
     };
     showComponents: boolean;
+    addressSource: AddressSource;
+    onAddressSourceChange: (checked: boolean) => void;
+    addressSourcePending: boolean;
 }) {
+    // Hosted checkout and Components v1 collect the billing address from
+    // our own form — when that form is bypassed in favor of Express
+    // Checkout session address collection, only Components v2 works.
+    const addressCollectedBySession = addressSource === 'session';
+
     return (
         <>
             <SegmentedControl.Root
@@ -36,12 +48,16 @@ export default function MethodSwitch({
                 value={variant}
                 onValueChange={onVariantChange}
             >
-                <SegmentedControl.Item value="hosted">
-                    Hosted Checkout
-                </SegmentedControl.Item>
-                <SegmentedControl.Item value="components">
-                    Components v1
-                </SegmentedControl.Item>
+                {!addressCollectedBySession && (
+                    <SegmentedControl.Item value="hosted">
+                        Hosted Checkout
+                    </SegmentedControl.Item>
+                )}
+                {!addressCollectedBySession && (
+                    <SegmentedControl.Item value="components">
+                        Components v1
+                    </SegmentedControl.Item>
+                )}
                 {showComponents && (
                     <SegmentedControl.Item value="components-v2">
                         Components v2
@@ -77,8 +93,24 @@ export default function MethodSwitch({
                                     will charge your card.
                                 </Callout.Text>
                             </Callout.Root>
-                            <SessionWrapper session={session} />
-                            <CardWrapperV2 session={session} />
+                            <AddressSourceToggle
+                                current={addressSource}
+                                onChange={onAddressSourceChange}
+                                pending={addressSourcePending}
+                            />
+                            <Box
+                                style={{
+                                    opacity: addressSourcePending ? 0.5 : 1,
+                                    pointerEvents: addressSourcePending
+                                        ? 'none'
+                                        : undefined,
+                                    transition: 'opacity 150ms ease',
+                                }}
+                                aria-busy={addressSourcePending}
+                            >
+                                <SessionWrapper session={session} />
+                                <CardWrapperV2 session={session} />
+                            </Box>
                         </>
                     ) : (
                         <Callout.Root

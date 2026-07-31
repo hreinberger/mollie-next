@@ -91,6 +91,11 @@ export type CreatePaymentParams = {
 // Checkout types
 export type CheckoutVariant = 'hosted' | 'components' | 'components-v2';
 
+// Controls whether billing/email details are collected by our own checkout
+// form, or delegated to the Mollie Express Checkout session (Apple Pay /
+// Google Pay). See requiredCustomerDetails on mollieCreateSession.
+export type AddressSource = 'form' | 'session';
+
 // Express Session Type
 export type ExpressSession = {
     id: string;
