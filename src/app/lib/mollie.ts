@@ -251,7 +251,15 @@ export async function mollieRefundPayment(
 // Express Components. The session returns a clientAccessToken that is passed to
 // the client-side Mollie2.Checkout() initializer in SessionWrapper.
 // Sessions use the live API key because Express Components only work in live mode.
-export async function mollieCreateSession(currency: string = 'EUR') {
+//
+// requiredCustomerDetails opts the session into Express address collection
+// (private beta): Mollie collects these details via the Express Component and
+// returns them on the session's / payment's billingAddress and shippingAddress.
+// See https://docs.mollie.com/docs/collect-customer-details-with-express-component
+export async function mollieCreateSession(
+    currency: string = 'EUR',
+    requiredCustomerDetails?: Array<'email' | 'billing-address' | 'shipping-address'>,
+) {
     try {
         const session = await fetch('https://api.mollie.com/v2/sessions', {
             method: 'POST',
@@ -266,6 +274,9 @@ export async function mollieCreateSession(currency: string = 'EUR') {
                     currency: currency,
                 },
                 redirectUrl: domain + '/success',
+                ...(requiredCustomerDetails?.length
+                    ? { requiredCustomerDetails }
+                    : {}),
                 lines: [
                     {
                         description: 'Demo Product',

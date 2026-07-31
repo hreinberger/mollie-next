@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { CaptureMethod } from '@mollie/api-client';
-import { ExtendedPaymentMethod } from './types';
+import { ExtendedPaymentMethod, AddressSource } from './types';
 
 export async function validateFormData(formData: FormData) {
     const form = Object.fromEntries(formData.entries());
@@ -97,5 +97,18 @@ export async function validateCountry(country: string) {
         return result;
     } catch (error) {
         throw new Error(`No valid country.`);
+    }
+}
+
+// Whether the checkout should collect the billing address via our own form,
+// or delegate it to the Mollie Express Checkout session. Falls back to
+// 'form' on any invalid input rather than throwing, since this is a
+// non-critical UI toggle (unlike currency/country, which feed the payment).
+export async function validateAddressSource(value: string): Promise<AddressSource> {
+    const addressSourceSchema = z.enum(['form', 'session']);
+    try {
+        return addressSourceSchema.parse(value);
+    } catch (error) {
+        return 'form';
     }
 }
