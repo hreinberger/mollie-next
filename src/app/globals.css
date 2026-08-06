@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @import '@radix-ui/themes/styles.css' layer(base);
 
+html {
+  /* Always reserve the scrollbar's width, even on pages that don't need to
+     scroll, so navigating between pages doesn't shift the content horizontally. */
+  scrollbar-gutter: stable;
+}
+
 @theme {
   --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
   --background-image-gradient-conic: conic-gradient(

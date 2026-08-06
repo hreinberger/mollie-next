@@ -1,3 +1,4 @@
+import { cacheLife } from 'next/cache';
 import { mollieGetMethods } from '@/app/lib/mollie';
 import HostedPaymentMethodsInteractive from './hostedpaymentmethods-interactive';
 
@@ -8,6 +9,9 @@ export default async function HostedPaymentMethodCards({
     currency?: string;
     country?: string;
 }) {
+    'use cache';
+    cacheLife('paymentMethods');
+
     const methods = await mollieGetMethods(currency, country);
 
     // Serialize to plain objects before crossing the Server/Client boundary.

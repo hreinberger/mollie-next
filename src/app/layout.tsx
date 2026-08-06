@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Suspense } from 'react';
 import { Theme, ThemePanel, Container, Section } from '@radix-ui/themes';
 
 import Navbar from '@/app/components/ui/navbar.js';
@@ -15,11 +16,9 @@ export const metadata: Metadata = {
     description: 'A demo app for Mollie payments',
 };
 
-export default async function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+// Reads the session cookie at request time. Isolated behind its own Suspense
+// boundary so the rest of the root layout stays prerenderable.
+async function NavbarWithSession() {
     const session = await getSession();
     const user = session.email
         ? {
@@ -29,6 +28,14 @@ export default async function RootLayout({
           }
         : null;
 
+    return <Navbar user={user} />;
+}
+
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
     return (
         <html
             lang="en"
@@ -49,7 +56,9 @@ export default async function RootLayout({
                                 pt="0"
                                 pb="4"
                             >
-                                <Navbar user={user} />
+                                <Suspense fallback={<Navbar user={null} />}>
+                                    <NavbarWithSession />
+                                </Suspense>
                             </Section>
                             <Section
                                 pt="4"

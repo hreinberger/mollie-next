@@ -14,7 +14,7 @@ import { ExpressSession } from '../lib/types';
 import { getSession } from '../lib/auth';
 
 // React components
-import { Suspense } from 'react';
+import { Suspense, ViewTransition } from 'react';
 
 // Validation for Currency Strings
 import {
@@ -22,9 +22,6 @@ import {
     validateCountry,
     validateAddressSource,
 } from '../lib/validation';
-
-// invalidate page cache every 5 minutes to pick up new available payment methods
-export const revalidate = 300;
 
 export default async function Page(props: {
     searchParams?: Promise<{
@@ -58,31 +55,35 @@ export default async function Page(props: {
     if (showComponents) {
         const { sessionId, clientAccessToken } = await mollieCreateSession(
             validatedCurrency,
-            collectAddressViaSession ? ['email', 'billing-address'] : undefined
+            collectAddressViaSession ? ['email', 'billing-address'] : undefined,
         );
         expressSession = { id: sessionId, clientAccessToken };
     }
 
     return (
-        <main>
-            <CheckoutForm
-                address={<Address addressSource={effectiveAddressSource} />}
-                hostedmethods={
-                    <Suspense
-                        // use the validated currency as key to re-trigger suspense when currency changes
-                        key={`${validatedCurrency}-${validatedCountry}`}
-                        fallback={<MethodsSkeleton />}
-                    >
-                        <HostedPaymentMethods
-                            currency={validatedCurrency}
-                            country={validatedCountry}
-                        />
-                    </Suspense>
-                }
-                session={expressSession}
-                showComponents={showComponents}
-                addressSource={effectiveAddressSource}
-            />
-        </main>
+        <ViewTransition>
+            <main>
+                <CheckoutForm
+                    address={<Address addressSource={effectiveAddressSource} />}
+                    hostedmethods={
+                        <ViewTransition>
+                            <Suspense
+                                // use the validated currency as key to re-trigger suspense when currency changes
+                                key={`${validatedCurrency}-${validatedCountry}`}
+                                fallback={<MethodsSkeleton />}
+                            >
+                                <HostedPaymentMethods
+                                    currency={validatedCurrency}
+                                    country={validatedCountry}
+                                />
+                            </Suspense>
+                        </ViewTransition>
+                    }
+                    session={expressSession}
+                    showComponents={showComponents}
+                    addressSource={effectiveAddressSource}
+                />
+            </main>
+        </ViewTransition>
     );
 }

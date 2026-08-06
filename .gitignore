@@ -41,3 +41,6 @@ next-env.d.ts
 AGENTS.md
 copilot-instructions.md
 CLAUDE.md
+.agents
+.claude
+skills-lock.json
