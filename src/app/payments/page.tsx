@@ -5,6 +5,7 @@ import { validateMolliePayment } from '@/app/lib/validation';
 import PaymentsTable from '../components/ui/paymentstable';
 import PaymentCards from '../components/ui/PaymentCards';
 import PaymentsControls from '../components/ui/PaymentsControls';
+import { ViewTransition } from 'react';
 
 export default async function Page(props: {
     searchParams?: Promise<{ mode?: string; from?: string }>;
@@ -32,22 +33,34 @@ export default async function Page(props: {
         await mollieGetPayments({ mode, from });
 
     return (
-        <main>
-            <Flex direction="column" gap="4" m="6">
-                <Heading>Recent Payments</Heading>
-                <PaymentsControls
-                    isMollie={isMollie}
-                    mode={mode}
-                    nextCursor={nextPageCursor ?? null}
-                    prevCursor={previousPageCursor ?? null}
-                />
-                <div className="hidden md:block">
-                    <PaymentsTable payments={payments} mode={mode} />
-                </div>
-                <div className="block md:hidden">
-                    <PaymentCards payments={payments} mode={mode} />
-                </div>
-            </Flex>
-        </main>
+        <ViewTransition>
+            <main>
+                <Flex
+                    direction="column"
+                    gap="4"
+                    m="6"
+                >
+                    <Heading>Recent Payments</Heading>
+                    <PaymentsControls
+                        isMollie={isMollie}
+                        mode={mode}
+                        nextCursor={nextPageCursor ?? null}
+                        prevCursor={previousPageCursor ?? null}
+                    />
+                    <div className="hidden md:block">
+                        <PaymentsTable
+                            payments={payments}
+                            mode={mode}
+                        />
+                    </div>
+                    <div className="block md:hidden">
+                        <PaymentCards
+                            payments={payments}
+                            mode={mode}
+                        />
+                    </div>
+                </Flex>
+            </main>
+        </ViewTransition>
     );
 }

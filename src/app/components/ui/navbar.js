@@ -1,15 +1,31 @@
 'use client';
 
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Text, Code, Flex, Avatar } from '@radix-ui/themes';
 
-import { usePathname } from 'next/navigation';
-import clsx from 'clsx';
 import MollieLogo from './mollielogo';
+import NavLinkLabel from './navlinklabel';
+
+// Deterministic Suspense fallback for NavLinkLabel — same size/weight as the
+// non-active state, since the active pathname isn't known in the static shell.
+function NavLinkLabelFallback({ children }) {
+    return (
+        <Text
+            size={{
+                initial: '1',
+                xs: '2',
+                md: '3',
+                xl: '4',
+            }}
+            className="transition-all duration-100 font-medium"
+        >
+            {children}
+        </Text>
+    );
+}
 
 export default function Navbar({ user }) {
-    const pathname = usePathname();
-
     return (
         <Flex
             asChild="true"
@@ -40,40 +56,30 @@ export default function Navbar({ user }) {
                 </Link>
                 <nav className="flex gap-6 items-center">
                     <Link href="/checkout">
-                        <Text
-                            size={{
-                                initial: '1',
-                                xs: '2',
-                                md: '3',
-                                xl: '4',
-                            }}
-                            className={clsx(
-                                'transition-all duration-100',
-                                pathname === '/checkout'
-                                    ? 'font-bold'
-                                    : 'font-medium',
-                            )}
+                        <Suspense
+                            fallback={
+                                <NavLinkLabelFallback>
+                                    Checkout
+                                </NavLinkLabelFallback>
+                            }
                         >
-                            Checkout
-                        </Text>
+                            <NavLinkLabel href="/checkout">
+                                Checkout
+                            </NavLinkLabel>
+                        </Suspense>
                     </Link>
                     <Link href="/payments">
-                        <Text
-                            size={{
-                                initial: '1',
-                                xs: '2',
-                                md: '3',
-                                xl: '4',
-                            }}
-                            className={clsx(
-                                'transition-all duration-100',
-                                pathname === '/payments'
-                                    ? 'font-bold'
-                                    : 'font-medium',
-                            )}
+                        <Suspense
+                            fallback={
+                                <NavLinkLabelFallback>
+                                    Payments
+                                </NavLinkLabelFallback>
+                            }
                         >
-                            Payments
-                        </Text>
+                            <NavLinkLabel href="/payments">
+                                Payments
+                            </NavLinkLabel>
+                        </Suspense>
                     </Link>
                     {user ? (
                         <Flex
@@ -95,7 +101,12 @@ export default function Navbar({ user }) {
                                         xl: '4',
                                     }}
                                 >
-                                    <Code color="gray" style={{ fontFamily: 'inherit' }}>Sign out</Code>
+                                    <Code
+                                        color="gray"
+                                        style={{ fontFamily: 'inherit' }}
+                                    >
+                                        Sign out
+                                    </Code>
                                 </Text>
                             </a>
                         </Flex>
@@ -109,7 +120,9 @@ export default function Navbar({ user }) {
                                     xl: '4',
                                 }}
                             >
-                                <Code style={{ fontFamily: 'inherit' }}>Sign in</Code>
+                                <Code style={{ fontFamily: 'inherit' }}>
+                                    Sign in
+                                </Code>
                             </Text>
                         </a>
                     )}

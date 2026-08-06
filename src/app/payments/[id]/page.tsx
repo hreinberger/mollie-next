@@ -1,5 +1,6 @@
 import { Flex, Heading } from '@radix-ui/themes';
 import { redirect } from 'next/navigation';
+import { ViewTransition } from 'react';
 
 import { validateMolliePayment } from '@/app/lib/validation';
 import { getSession } from '@/app/lib/auth';
@@ -27,14 +28,19 @@ export default async function Page({
     }
 
     return (
-        <main>
-            <Flex
-                direction="column"
-                m="6"
-            >
-                <Heading>Payment Details</Heading>
-                <PaymentOverview id={id} mode={mode} />
-            </Flex>
-        </main>
+        <ViewTransition>
+            <main>
+                <Flex
+                    direction="column"
+                    m="6"
+                >
+                    <Heading>Payment Details</Heading>
+                    <PaymentOverview
+                        id={id}
+                        mode={mode}
+                    />
+                </Flex>
+            </main>
+        </ViewTransition>
     );
 }
