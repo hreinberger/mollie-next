@@ -23,7 +23,7 @@ export default function CardWrapperV2({ session }) {
                 { locale: 'en-US' }
             );
 
-            cardComponent = checkout.create('card');
+            cardComponent = checkout.create('card-component');
             cardComponent.mount(document.getElementById('mollie-component'));
         } catch (error) {
             console.error('Card v2 component error:', error);

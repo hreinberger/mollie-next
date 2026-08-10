@@ -12,7 +12,7 @@ import { createSessionPayment } from '@/app/lib/server-actions';
  *  1. The server creates a Mollie Session (via mollieCreateSession) and passes
  *     the clientAccessToken down to this component as part of the `session` prop.
  *  2. We initialize a Mollie2 Checkout instance using that token.
- *  3. We create an 'express-checkout' component and mount it to the DOM.
+ *  3. We create an 'express-component' component and mount it to the DOM.
  *  4. The component renders the payment buttons (e.g. Apple Pay, Google Pay).
  *  5. When the user selects a payment method the SDK fires 'readyforpayment',
  *     at which point we call our server action to create the actual payment.
@@ -51,8 +51,8 @@ export default function SessionWrapper({ session }) {
                 return;
             }
 
-            // Step 2: Create the express-checkout component (renders Apple Pay, Google Pay, etc.)
-            expressComponent = checkout.create('express-checkout');
+            // Step 2: Create the express-component component (renders Apple Pay, Google Pay, etc.)
+            expressComponent = checkout.create('express-component');
 
             if (
                 !expressComponent ||
