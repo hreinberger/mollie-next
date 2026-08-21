@@ -50,12 +50,12 @@ declare global {
         // the "old" Mollie object for card components
         Mollie: (
             profileId: string,
-            options: { locale: string; testmode: boolean }
+            options: { locale: string; testmode: boolean },
         ) => MollieInstance;
         // the new Mollie object for express components
         Mollie2: (
             clientAccessToken: string,
-            options: { locale: string }
+            options: { locale: string },
         ) => MollieExpressInstance;
     }
 }
@@ -101,3 +101,32 @@ export type ExpressSession = {
     id: string;
     clientAccessToken: string;
 };
+
+// A selectable delivery option offered by the Express Checkout session when
+// address collection is delegated to Mollie. See shippingOptions on
+// mollieCreateSession.
+export type ShippingOption = {
+    reference: string;
+    description: string;
+    amount: {
+        currency: string;
+        value: string;
+    };
+};
+
+// Fixed demo shipping options offered once address collection is delegated to
+// the session.
+export function getFixedShippingOptions(currency: string): ShippingOption[] {
+    return [
+        {
+            reference: 'free',
+            description: 'Free shipping',
+            amount: { currency, value: '0.00' },
+        },
+        {
+            reference: 'express',
+            description: 'Express shipping',
+            amount: { currency, value: '0.01' },
+        },
+    ];
+}
