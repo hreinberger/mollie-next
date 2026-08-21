@@ -50,12 +50,12 @@ declare global {
         // the "old" Mollie object for card components
         Mollie: (
             profileId: string,
-            options: { locale: string; testmode: boolean }
+            options: { locale: string; testmode: boolean },
         ) => MollieInstance;
         // the new Mollie object for express components
         Mollie2: (
             clientAccessToken: string,
-            options: { locale: string }
+            options: { locale: string },
         ) => MollieExpressInstance;
     }
 }
@@ -115,8 +115,7 @@ export type ShippingOption = {
 };
 
 // Fixed demo shipping options offered once address collection is delegated to
-// the session. See
-// https://mollie.atlassian.net/wiki/spaces/PPE/pages/6804078599/Fixed+shipping+options
+// the session.
 export function getFixedShippingOptions(currency: string): ShippingOption[] {
     return [
         {

@@ -8,7 +8,11 @@ import createMollieClient, {
     PaymentLineCategory,
     PaymentMethod,
 } from '@mollie/api-client';
-import { CreatePaymentParams, ALWAYS_AUTHORIZE_METHODS, ShippingOption } from './types';
+import {
+    CreatePaymentParams,
+    ALWAYS_AUTHORIZE_METHODS,
+    ShippingOption,
+} from './types';
 
 const apiKey = process.env.MOLLIE_API_KEY;
 const liveApiKey = process.env.MOLLIE_LIVE_API_KEY;
@@ -157,11 +161,13 @@ export async function mollieCreatePayment({
     return redirectUrl;
 }
 
-export async function mollieGetPayments(opts: {
-    mode?: 'test' | 'live';
-    from?: string;
-    limit?: number;
-} = {}) {
+export async function mollieGetPayments(
+    opts: {
+        mode?: 'test' | 'live';
+        from?: string;
+        limit?: number;
+    } = {},
+) {
     const { mode = 'test', from, limit = 20 } = opts;
     const client = mode === 'live' ? livePaymentsClient : mollieClient;
     const page = await client.payments.page({
@@ -183,9 +189,14 @@ export async function mollieGetLatestPaymentStatus() {
 }
 
 // Get a specific payment by its ID, with captures embedded
-export async function mollieGetPayment(id: string, mode: 'test' | 'live' = 'test') {
+export async function mollieGetPayment(
+    id: string,
+    mode: 'test' | 'live' = 'test',
+) {
     const client = mode === 'live' ? livePaymentsClient : mollieClient;
-    const payment = await client.payments.get(id, { embed: ['captures', 'refunds'] } as any);
+    const payment = await client.payments.get(id, {
+        embed: ['captures', 'refunds'],
+    } as any);
     return payment;
 }
 
@@ -258,11 +269,12 @@ export async function mollieRefundPayment(
 // See https://docs.mollie.com/docs/collect-customer-details-with-express-component
 //
 // shippingOptions offers selectable delivery options alongside that address
-// collection. See getFixedShippingOptions and
-// https://mollie.atlassian.net/wiki/spaces/PPE/pages/6804078599/Fixed+shipping+options
+// collection.
 export async function mollieCreateSession(
     currency: string = 'EUR',
-    requiredCustomerDetails?: Array<'email' | 'billing-address' | 'shipping-address'>,
+    requiredCustomerDetails?: Array<
+        'email' | 'billing-address' | 'shipping-address'
+    >,
     shippingOptions?: ShippingOption[],
 ) {
     try {
