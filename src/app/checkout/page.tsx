@@ -8,7 +8,7 @@ import MethodsSkeleton from '../components/form/methods/methodskeleton';
 
 // session handling for Express Components
 import { mollieCreateSession } from '../lib/mollie';
-import { ExpressSession } from '../lib/types';
+import { ExpressSession, getFixedShippingOptions } from '../lib/types';
 
 // auth
 import { getSession } from '../lib/auth';
@@ -55,7 +55,12 @@ export default async function Page(props: {
     if (showComponents) {
         const { sessionId, clientAccessToken } = await mollieCreateSession(
             validatedCurrency,
-            collectAddressViaSession ? ['email', 'billing-address'] : undefined,
+            collectAddressViaSession
+                ? ['email', 'billing-address', 'shipping-address']
+                : undefined,
+            collectAddressViaSession
+                ? getFixedShippingOptions(validatedCurrency)
+                : undefined,
         );
         expressSession = { id: sessionId, clientAccessToken };
     }

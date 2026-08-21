@@ -8,7 +8,7 @@ import createMollieClient, {
     PaymentLineCategory,
     PaymentMethod,
 } from '@mollie/api-client';
-import { CreatePaymentParams, ALWAYS_AUTHORIZE_METHODS } from './types';
+import { CreatePaymentParams, ALWAYS_AUTHORIZE_METHODS, ShippingOption } from './types';
 
 const apiKey = process.env.MOLLIE_API_KEY;
 const liveApiKey = process.env.MOLLIE_LIVE_API_KEY;
@@ -256,9 +256,14 @@ export async function mollieRefundPayment(
 // (private beta): Mollie collects these details via the Express Component and
 // returns them on the session's / payment's billingAddress and shippingAddress.
 // See https://docs.mollie.com/docs/collect-customer-details-with-express-component
+//
+// shippingOptions offers selectable delivery options alongside that address
+// collection. See getFixedShippingOptions and
+// https://mollie.atlassian.net/wiki/spaces/PPE/pages/6804078599/Fixed+shipping+options
 export async function mollieCreateSession(
     currency: string = 'EUR',
     requiredCustomerDetails?: Array<'email' | 'billing-address' | 'shipping-address'>,
+    shippingOptions?: ShippingOption[],
 ) {
     try {
         const session = await fetch('https://api.mollie.com/v2/sessions', {
@@ -277,6 +282,7 @@ export async function mollieCreateSession(
                 ...(requiredCustomerDetails?.length
                     ? { requiredCustomerDetails }
                     : {}),
+                ...(shippingOptions?.length ? { shippingOptions } : {}),
                 lines: [
                     {
                         description: 'Demo Product',
