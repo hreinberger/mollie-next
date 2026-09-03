@@ -269,7 +269,7 @@ export async function mollieRefundPayment(
 // See https://docs.mollie.com/docs/collect-customer-details-with-express-component
 //
 // shippingOptions offers selectable delivery options alongside that address
-// collection.
+// collection. They are sent to the API nested under shipping.options.
 export async function mollieCreateSession(
     currency: string = 'EUR',
     requiredCustomerDetails?: Array<
@@ -294,7 +294,9 @@ export async function mollieCreateSession(
                 ...(requiredCustomerDetails?.length
                     ? { requiredCustomerDetails }
                     : {}),
-                ...(shippingOptions?.length ? { shippingOptions } : {}),
+                ...(shippingOptions?.length
+                    ? { shipping: { options: shippingOptions } }
+                    : {}),
                 lines: [
                     {
                         description: 'Demo Product',
