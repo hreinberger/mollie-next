@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, SegmentedControl, Callout } from '@radix-ui/themes';
+import { Box, SegmentedControl, Callout, Tabs } from '@radix-ui/themes';
 import { ExclamationTriangleIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 
 import React, { Suspense } from 'react';
@@ -9,6 +9,7 @@ import MethodsSkeleton from './methodskeleton';
 import ComponentPaymentMethods from './componentpaymentmethods';
 import SessionWrapper from '@/app/components/form/methods/SessionWrapper';
 import CardWrapperV2 from '@/app/components/form/methods/CardWrapperV2';
+import MethodsWrapperV2 from '@/app/components/form/methods/MethodsWrapperV2';
 import AddressSourceToggle from '@/app/components/form/AddressSourceToggle';
 
 import { CheckoutVariant, AddressSource } from '@/app/lib/types';
@@ -39,6 +40,21 @@ export default function MethodSwitch({
     // our own form — when that form is bypassed in favor of Express
     // Checkout session address collection, only Components v2 works.
     const addressCollectedBySession = addressSource === 'session';
+
+    type MethodsTabValue = 'methods' | 'express' | 'card';
+    const [activeMethodsTab, setActiveMethodsTab] =
+        React.useState<MethodsTabValue>(
+            addressCollectedBySession ? 'express' : 'methods'
+        );
+
+    // The "Payment methods" tab only exists when address collection isn't
+    // delegated to the session — if it's selected when that toggles on, fall
+    // back to the Express Checkout tab instead of leaving no tab active.
+    React.useEffect(() => {
+        if (addressCollectedBySession && activeMethodsTab === 'methods') {
+            setActiveMethodsTab('express');
+        }
+    }, [addressCollectedBySession, activeMethodsTab]);
 
     return (
         <>
@@ -93,11 +109,6 @@ export default function MethodSwitch({
                                     will charge your card.
                                 </Callout.Text>
                             </Callout.Root>
-                            <AddressSourceToggle
-                                current={addressSource}
-                                onChange={onAddressSourceChange}
-                                pending={addressSourcePending}
-                            />
                             <Box
                                 style={{
                                     opacity: addressSourcePending ? 0.5 : 1,
@@ -108,8 +119,57 @@ export default function MethodSwitch({
                                 }}
                                 aria-busy={addressSourcePending}
                             >
-                                <SessionWrapper session={session} />
-                                <CardWrapperV2 session={session} />
+                                <Tabs.Root
+                                    value={activeMethodsTab}
+                                    onValueChange={(value) =>
+                                        setActiveMethodsTab(
+                                            value as MethodsTabValue
+                                        )
+                                    }
+                                >
+                                    <Tabs.List>
+                                        {!addressCollectedBySession && (
+                                            <Tabs.Trigger value="methods">
+                                                Payment methods
+                                            </Tabs.Trigger>
+                                        )}
+                                        <Tabs.Trigger value="express">
+                                            Express Checkout
+                                        </Tabs.Trigger>
+                                        <Tabs.Trigger value="card">
+                                            Card
+                                        </Tabs.Trigger>
+                                    </Tabs.List>
+
+                                    <Box pt="3">
+                                        {!addressCollectedBySession && (
+                                            <Tabs.Content value="methods">
+                                                <MethodsWrapperV2
+                                                    session={session}
+                                                />
+                                            </Tabs.Content>
+                                        )}
+
+                                        <Tabs.Content value="express">
+                                            <AddressSourceToggle
+                                                current={addressSource}
+                                                onChange={
+                                                    onAddressSourceChange
+                                                }
+                                                pending={addressSourcePending}
+                                            />
+                                            <SessionWrapper
+                                                session={session}
+                                            />
+                                        </Tabs.Content>
+
+                                        <Tabs.Content value="card">
+                                            <CardWrapperV2
+                                                session={session}
+                                            />
+                                        </Tabs.Content>
+                                    </Box>
+                                </Tabs.Root>
                             </Box>
                         </>
                     ) : (
