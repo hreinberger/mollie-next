@@ -3,8 +3,6 @@
 import { Flex } from '@radix-ui/themes';
 import { useEffect } from 'react';
 
-import { createSessionPayment } from '@/app/lib/server-actions';
-
 /**
  * SessionWrapper mounts a Mollie Express Checkout component.
  *
@@ -14,8 +12,9 @@ import { createSessionPayment } from '@/app/lib/server-actions';
  *  2. We initialize a Mollie2 Checkout instance using that token.
  *  3. We create an 'express-component' component and mount it to the DOM.
  *  4. The component renders the payment buttons (e.g. Apple Pay, Google Pay).
- *  5. When the user selects a payment method the SDK fires 'readyforpayment',
- *     at which point we call our server action to create the actual payment.
+ *  5. Once the buyer confirms a payment method, the Session creates the Payment
+ *     automatically — there is no client- or server-side "create payment" call
+ *     to make. The buyer is then redirected to the session's redirectUrl.
  */
 export default function SessionWrapper({ session }) {
     useEffect(() => {
@@ -40,13 +39,9 @@ export default function SessionWrapper({ session }) {
                 locale: 'en-US',
             });
 
-            if (
-                !checkout ||
-                typeof checkout.create !== 'function' ||
-                typeof checkout.on !== 'function'
-            ) {
+            if (!checkout || typeof checkout.create !== 'function') {
                 console.error(
-                    'Failed to initialize Mollie Checkout instance or `create` or `on` method is missing.'
+                    'Failed to initialize Mollie Checkout instance or `create` method is missing.'
                 );
                 return;
             }
@@ -77,21 +72,6 @@ export default function SessionWrapper({ session }) {
             }
 
             expressComponent.mount(mountPoint);
-
-            // Step 4: Listen for 'readyforpayment' — fired when the user has selected
-            // a payment method and the SDK is ready to process the payment.
-            const handleReadyForPayment = async (data) => {
-                try {
-                    await createSessionPayment(session.id);
-                } catch (error) {
-                    console.error(
-                        'Error processing readyforpayment event:',
-                        error
-                    );
-                }
-            };
-
-            checkout.on('readyforpayment', handleReadyForPayment);
         } catch (error) {
             console.error('Error during Mollie component setup:', error);
             expressComponent = null;

@@ -2,10 +2,7 @@
 
 // Lib
 import { validateFormData, validateUrl } from '@/app/lib/validation';
-import {
-    mollieCreatePayment,
-    mollieCreateSessionPayment,
-} from '@/app/lib/mollie';
+import { mollieCreatePayment } from '@/app/lib/mollie';
 import { PaymentMethod, CaptureMethod } from '@mollie/api-client';
 import { ExtendedPaymentMethodType } from '@/app/lib/types';
 
@@ -43,12 +40,4 @@ export async function createPayment(formData: FormData) {
 
     // redirect to Mollie hosted checkout
     redirect(validatedRedirectUrl);
-}
-
-// createSessionPayment is called by the Express Component (SessionWrapper) when
-// the user has selected a payment method and the SDK fires 'readyforpayment'.
-// Unlike createPayment, there is no redirect — the Express Component handles
-// the payment flow entirely on the client side after the payment is created.
-export async function createSessionPayment(sessionId: string) {
-    await mollieCreateSessionPayment(sessionId);
 }
