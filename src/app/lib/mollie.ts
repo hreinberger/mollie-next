@@ -19,15 +19,6 @@ const liveApiKey = process.env.MOLLIE_LIVE_API_KEY;
 const domain = process.env.DOMAIN || 'http://localhost:3000';
 const webhookUrl = process.env.WEBHOOK_URL || 'http://not.provided';
 
-// Validate that a sessionId has a safe format before using it in a URL path.
-// This prevents user-controlled data from arbitrarily changing the request URL.
-function isValidSessionId(sessionId: string): boolean {
-    // Allow only URL-safe characters and limit length to a reasonable maximum.
-    // Adjust the regex if Mollie session IDs have a stricter known format.
-    const SESSION_ID_REGEX = /^[A-Za-z0-9_-]{1,64}$/;
-    return SESSION_ID_REGEX.test(sessionId);
-}
-
 if (!apiKey) {
     throw new Error('MOLLIE_API_KEY is not defined');
 }
@@ -263,6 +254,9 @@ export async function mollieRefundPayment(
 // the client-side Mollie2.Checkout() initializer in SessionWrapper.
 // Sessions use the live API key because Express Components only work in live mode.
 //
+// payment.webhookUrl is set so it carries over to the Payment the Session
+// creates automatically — this is how we still get notified for fulfilment.
+//
 // requiredCustomerDetails opts the session into Express address collection
 // (private beta): Mollie collects these details via the Express Component and
 // returns them on the session's / payment's billingAddress and shippingAddress.
@@ -287,10 +281,13 @@ export async function mollieCreateSession(
             body: JSON.stringify({
                 description: 'Order #1234',
                 amount: {
-                    value: '0.10',
+                    value: '0.02',
                     currency: currency,
                 },
                 redirectUrl: domain + '/success',
+                payment: {
+                    webhookUrl: webhookUrl,
+                },
                 ...(requiredCustomerDetails?.length
                     ? { requiredCustomerDetails }
                     : {}),
@@ -303,11 +300,11 @@ export async function mollieCreateSession(
                         quantity: 1,
                         unitPrice: {
                             currency: currency,
-                            value: '0.10',
+                            value: '0.02',
                         },
                         totalAmount: {
                             currency: currency,
-                            value: '0.10',
+                            value: '0.02',
                         },
                     },
                 ],
@@ -326,36 +323,4 @@ export async function mollieCreateSession(
         console.error('Error creating Mollie session:', error);
         throw error;
     }
-}
-
-// mollieCreateSessionPayment creates a payment linked to an existing session.
-// This is called server-side when the Express Component fires 'readyforpayment',
-// signalling that the user has confirmed their payment method.
-export async function mollieCreateSessionPayment(sessionId: string) {
-    if (!isValidSessionId(sessionId)) {
-        throw new Error('Invalid sessionId format');
-    }
-    const payment = await fetch(
-        `https://api.mollie.com/v2/sessions/${sessionId}/payments`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + liveApiKey,
-            },
-            body: JSON.stringify({
-                description: 'Test Express Payment',
-                amount: {
-                    value: '0.10',
-                    currency: 'EUR',
-                },
-            }),
-        },
-    );
-    if (!payment.ok) {
-        throw new Error(
-            `Failed to create session payment: ${payment.status} ${payment.statusText}`,
-        );
-    }
-    return payment;
 }
