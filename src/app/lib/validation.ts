@@ -112,3 +112,12 @@ export async function validateAddressSource(value: string): Promise<AddressSourc
         return 'form';
     }
 }
+
+export async function validateBalanceTransactionCursor(id: string) {
+    const cursorSchema = z.string().startsWith('baltr_');
+    try {
+        return cursorSchema.parse(id);
+    } catch (error) {
+        throw new Error(`No valid Mollie balance transaction ID.`);
+    }
+}

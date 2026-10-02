@@ -12,6 +12,8 @@ import {
     CreatePaymentParams,
     ALWAYS_AUTHORIZE_METHODS,
     ShippingOption,
+    Balance,
+    BalanceTransaction,
 } from './types';
 
 const apiKey = process.env.MOLLIE_API_KEY;
@@ -323,4 +325,55 @@ export async function mollieCreateSession(
         console.error('Error creating Mollie session:', error);
         throw error;
     }
+}
+
+// Balances API — live mode only, and not part of @mollie/api-client 4.x,
+// so these call the REST API directly. Profile API keys get a 403 here; the
+// endpoint needs an organization access token (access_…).
+async function mollieLiveGet<T>(path: string): Promise<T> {
+    const accessToken = process.env.MOLLIE_ACCESS_TOKEN;
+    if (!accessToken) {
+        throw new Error('MOLLIE_ACCESS_TOKEN is not set');
+    }
+    const response = await fetch('https://api.mollie.com/v2' + path, {
+        headers: { Authorization: 'Bearer ' + accessToken },
+        cache: 'no-store',
+    });
+    if (!response.ok) {
+        const body = await response.text();
+        console.error(`Mollie GET ${path} failed (${response.status}):`, body);
+        throw new Error(`Mollie GET ${path} failed with ${response.status}`);
+    }
+    return response.json() as Promise<T>;
+}
+
+function cursorFromLink(link?: { href: string } | null) {
+    if (!link?.href) return undefined;
+    return new URL(link.href).searchParams.get('from') ?? undefined;
+}
+
+export async function mollieGetPrimaryBalance() {
+    return mollieLiveGet<Balance>('/balances/primary');
+}
+
+export async function mollieGetBalanceTransactions(
+    opts: { balanceId?: string; from?: string; limit?: number } = {},
+) {
+    const { balanceId = 'primary', from, limit = 20 } = opts;
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (from) params.set('from', from);
+
+    const data = await mollieLiveGet<{
+        _embedded: { balance_transactions: BalanceTransaction[] };
+        _links: {
+            next?: { href: string } | null;
+            previous?: { href: string } | null;
+        };
+    }>(`/balances/${encodeURIComponent(balanceId)}/transactions?${params}`);
+
+    return {
+        transactions: data._embedded.balance_transactions,
+        nextPageCursor: cursorFromLink(data._links.next),
+        previousPageCursor: cursorFromLink(data._links.previous),
+    };
 }

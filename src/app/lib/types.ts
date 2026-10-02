@@ -130,3 +130,35 @@ export function getFixedShippingOptions(currency: string): ShippingOption[] {
         },
     ];
 }
+
+// Balances API types (not covered by @mollie/api-client 4.x)
+export type MollieAmount = { value: string; currency: string };
+
+export type Balance = {
+    id: string;
+    mode: 'live' | 'test';
+    createdAt: string;
+    currency: string;
+    description?: string;
+    status: 'active' | 'inactive';
+    transferFrequency?: string;
+    transferThreshold?: MollieAmount;
+    transferReference?: string | null;
+    transferDestination?: {
+        type: string;
+        beneficiaryName?: string;
+        bankAccount?: string;
+    } | null;
+    availableAmount: MollieAmount;
+    pendingAmount: MollieAmount;
+};
+
+export type BalanceTransaction = {
+    id: string;
+    type: string;
+    resultAmount: MollieAmount;
+    initialAmount: MollieAmount;
+    deductions?: MollieAmount;
+    context?: Record<string, unknown>;
+    createdAt: string;
+};

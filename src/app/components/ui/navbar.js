@@ -81,6 +81,21 @@ export default function Navbar({ user }) {
                             </NavLinkLabel>
                         </Suspense>
                     </Link>
+                    {user?.isMollie && (
+                        <Link href="/balances">
+                            <Suspense
+                                fallback={
+                                    <NavLinkLabelFallback>
+                                        Balances
+                                    </NavLinkLabelFallback>
+                                }
+                            >
+                                <NavLinkLabel href="/balances">
+                                    Balances
+                                </NavLinkLabel>
+                            </Suspense>
+                        </Link>
+                    )}
                     {user ? (
                         <Flex
                             align="center"
