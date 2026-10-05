@@ -113,11 +113,33 @@ export async function validateAddressSource(value: string): Promise<AddressSourc
     }
 }
 
-export async function validateBalanceTransactionCursor(id: string) {
-    const cursorSchema = z.string().startsWith('baltr_');
+// Used both for the `from` pagination cursor and for a balance transaction's
+// own ID in the detail route — both are the same `baltr_…` identifier.
+export async function validateBalanceTransactionId(id: string) {
+    const schema = z.string().startsWith('baltr_');
     try {
-        return cursorSchema.parse(id);
+        return schema.parse(id);
     } catch (error) {
         throw new Error(`No valid Mollie balance transaction ID.`);
+    }
+}
+
+// The `history` query param on /balances is a client-maintained stack of
+// previously-visited cursors (see BalancesControls — Mollie's API provides
+// no backward pagination link, so we track it ourselves). Each entry is
+// either a `baltr_…` cursor, or the '~' sentinel for "the first page, which
+// has no cursor of its own".
+export async function validateBalanceTransactionHistory(
+    value: string,
+): Promise<string[]> {
+    const entrySchema = z.union([z.literal('~'), z.string().startsWith('baltr_')]);
+    const schema = z
+        .string()
+        .transform((s) => s.split(','))
+        .pipe(z.array(entrySchema));
+    try {
+        return schema.parse(value);
+    } catch (error) {
+        throw new Error(`No valid balance transaction history.`);
     }
 }

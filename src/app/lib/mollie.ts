@@ -347,7 +347,7 @@ async function mollieLiveGet<T>(path: string): Promise<T> {
     return response.json() as Promise<T>;
 }
 
-function cursorFromLink(link?: { href: string } | null) {
+function cursorFromLink(link?: { href: string } | null): string | undefined {
     if (!link?.href) return undefined;
     return new URL(link.href).searchParams.get('from') ?? undefined;
 }
@@ -363,6 +363,7 @@ export async function mollieGetBalanceTransactions(
     const params = new URLSearchParams({ limit: String(limit) });
     if (from) params.set('from', from);
 
+    // Note: we only request `next` from the API — see nextPageCursor below.
     const data = await mollieLiveGet<{
         _embedded: { balance_transactions: BalanceTransaction[] };
         _links: {
@@ -374,6 +375,32 @@ export async function mollieGetBalanceTransactions(
     return {
         transactions: data._embedded.balance_transactions,
         nextPageCursor: cursorFromLink(data._links.next),
-        previousPageCursor: cursorFromLink(data._links.previous),
+        // Deliberately not exposing a `previousPageCursor`: verified against
+        // the live API that `_links.previous` on this endpoint is always
+        // null, even several pages deep — Mollie just doesn't provide
+        // backward cursors here. BalancesControls tracks back-navigation
+        // itself via a history stack in the URL instead of relying on this.
     };
+}
+
+// The Balances API has no "get single transaction" endpoint — only the list
+// above. `from` is documented as inclusive ("start from the item with the
+// given ID and onwards"), so asking for exactly one result starting at this
+// ID returns the transaction itself. We double-check the ID we get back
+// matches, in case it doesn't exist and the API just returns whatever is
+// next in the list instead of a 404.
+export async function mollieGetBalanceTransaction(
+    id: string,
+    balanceId: string = 'primary',
+) {
+    const { transactions } = await mollieGetBalanceTransactions({
+        balanceId,
+        from: id,
+        limit: 1,
+    });
+    const transaction = transactions[0];
+    if (!transaction || transaction.id !== id) {
+        throw new Error(`Balance transaction ${id} not found`);
+    }
+    return transaction;
 }
