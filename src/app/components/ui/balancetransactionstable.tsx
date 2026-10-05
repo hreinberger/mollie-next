@@ -1,4 +1,5 @@
-import { Badge, Flex, Table, Text } from '@radix-ui/themes';
+import { Badge, Flex, IconButton, Table, Text } from '@radix-ui/themes';
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { BalanceTransaction } from '@/app/lib/types';
 
@@ -34,9 +35,7 @@ export default function BalanceTransactionsTable({
                         <Table.ColumnHeaderCell className="hidden md:table-cell">
                             Related
                         </Table.ColumnHeaderCell>
-                        <Table.ColumnHeaderCell className="hidden lg:table-cell">
-                            Transaction ID
-                        </Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Details</Table.ColumnHeaderCell>
                     </Table.Row>
                 </Table.Header>
 
@@ -78,8 +77,16 @@ export default function BalanceTransactionsTable({
                                         related ?? '—'
                                     )}
                                 </Table.Cell>
-                                <Table.Cell className="hidden lg:table-cell">
-                                    {tx.id}
+                                <Table.Cell align="center">
+                                    <IconButton
+                                        variant="outline"
+                                        aria-label="Details"
+                                        asChild
+                                    >
+                                        <Link href={`/balances/transactions/${tx.id}`}>
+                                            <MagnifyingGlassIcon />
+                                        </Link>
+                                    </IconButton>
                                 </Table.Cell>
                             </Table.Row>
                         );
