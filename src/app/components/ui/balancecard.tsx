@@ -38,23 +38,6 @@ export default function BalanceCard({ balance }: { balance: Balance }) {
                         <DataList.Label>Currency</DataList.Label>
                         <DataList.Value>{balance.currency}</DataList.Value>
                     </DataList.Item>
-                    <DataList.Item>
-                        <DataList.Label>Transfer frequency</DataList.Label>
-                        <DataList.Value>{balance.transferFrequency ?? '—'}</DataList.Value>
-                    </DataList.Item>
-                    <DataList.Item>
-                        <DataList.Label>Transfer threshold</DataList.Label>
-                        <DataList.Value>{formatAmount(balance.transferThreshold)}</DataList.Value>
-                    </DataList.Item>
-                    <DataList.Item>
-                        <DataList.Label>Created</DataList.Label>
-                        <DataList.Value>
-                            {new Date(balance.createdAt).toLocaleString('de-DE', {
-                                dateStyle: 'medium',
-                                timeStyle: 'short',
-                            })}
-                        </DataList.Value>
-                    </DataList.Item>
                 </DataList.Root>
             </Flex>
         </Card>

@@ -5,14 +5,17 @@ import {
     mollieGetBalanceTransactions,
     mollieGetPrimaryBalance,
 } from '@/app/lib/mollie';
-import { validateBalanceTransactionCursor } from '@/app/lib/validation';
+import {
+    validateBalanceTransactionHistory,
+    validateBalanceTransactionId,
+} from '@/app/lib/validation';
 import BalanceCard from '../components/ui/balancecard';
 import BalanceTransactionsTable from '../components/ui/balancetransactionstable';
 import BalancesControls from '../components/ui/BalancesControls';
 import { ViewTransition } from 'react';
 
 export default async function Page(props: {
-    searchParams?: Promise<{ from?: string }>;
+    searchParams?: Promise<{ from?: string; history?: string }>;
 }) {
     const searchParams = await props.searchParams;
     const session = await getSession();
@@ -38,9 +41,18 @@ export default async function Page(props: {
     let from: string | undefined;
     if (searchParams?.from) {
         try {
-            from = await validateBalanceTransactionCursor(searchParams.from);
+            from = await validateBalanceTransactionId(searchParams.from);
         } catch {
             from = undefined;
+        }
+    }
+
+    let history: string[] = [];
+    if (searchParams?.history) {
+        try {
+            history = await validateBalanceTransactionHistory(searchParams.history);
+        } catch {
+            history = [];
         }
     }
 
@@ -67,7 +79,7 @@ export default async function Page(props: {
             </main>
         );
     }
-    const [balance, { transactions, nextPageCursor, previousPageCursor }] = data;
+    const [balance, { transactions, nextPageCursor }] = data;
 
     return (
         <ViewTransition>
@@ -77,8 +89,9 @@ export default async function Page(props: {
                     <BalanceCard balance={balance} />
                     <Heading size="5" mt="4">Transactions</Heading>
                     <BalancesControls
+                        currentFrom={from ?? null}
+                        history={history}
                         nextCursor={nextPageCursor ?? null}
-                        prevCursor={previousPageCursor ?? null}
                     />
                     <BalanceTransactionsTable transactions={transactions} />
                 </Flex>
