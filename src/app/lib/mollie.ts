@@ -341,7 +341,16 @@ async function mollieLiveGet<T>(path: string): Promise<T> {
     });
     if (!response.ok) {
         const body = await response.text();
-        console.error(`Mollie GET ${path} failed (${response.status}):`, body);
+        // Logged as an object, not a template literal with trailing args —
+        // `path` is influenced by caller-supplied IDs, and console.error
+        // treats a string first argument as a util.format format string.
+        // A path containing e.g. "%s" would otherwise consume `body` as a
+        // substitution and garble the log (CodeQL js/tainted-format-string).
+        console.error('Mollie GET failed', {
+            path,
+            status: response.status,
+            body,
+        });
         throw new Error(`Mollie GET ${path} failed with ${response.status}`);
     }
     return response.json() as Promise<T>;
