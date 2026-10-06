@@ -6,7 +6,6 @@ import createMollieClient, {
     Payment,
     SequenceType,
     PaymentLineCategory,
-    PaymentMethod,
 } from '@mollie/api-client';
 import {
     CreatePaymentParams,
@@ -260,7 +259,7 @@ export async function mollieRefundPayment(
 
 // mollieCreateSession creates a Mollie Session, which is the starting point for
 // Express Components. The session returns a clientAccessToken that is passed to
-// the client-side Mollie2.Checkout() initializer in SessionWrapper.
+// the client-side Mollie2.Checkout() initializer in MollieV2Component.
 // Sessions use the live API key because Express Components only work in live mode.
 //
 // payment.webhookUrl is set so it carries over to the Payment the Session
