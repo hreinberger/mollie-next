@@ -10,7 +10,7 @@ import {
 import Link from 'next/link';
 import { mollieGetBalanceTransaction } from '@/app/lib/mollie';
 import { contextId, formatAmount, formatDateTime } from '@/app/lib/format';
-import RawJsonDump from './RawJsonDump';
+import RawJsonDump from '../shared/RawJsonDump';
 
 export default async function BalanceTransactionOverview({
     id,

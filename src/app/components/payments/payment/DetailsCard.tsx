@@ -1,7 +1,7 @@
 import { Box, Card, Code, DataList, Flex, Heading, Table, Text } from '@radix-ui/themes';
 import { Payment } from '@mollie/api-client';
-import StateBadge from '../orderstatebadge';
-import PaymentLogo from '../../form/paymentlogo';
+import StateBadge from '../../shared/orderstatebadge';
+import PaymentLogo from '../../checkout/paymentlogo';
 import { formatDateTime } from '@/app/lib/format';
 
 type BillingAddress = {

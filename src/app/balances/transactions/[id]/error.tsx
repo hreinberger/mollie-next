@@ -1,6 +1,6 @@
 'use client';
 
-import ErrorBoundaryCard from '@/app/components/ui/ErrorBoundaryCard';
+import ErrorBoundaryCard from '@/app/components/shared/ErrorBoundaryCard';
 
 export default function Error({
     error,

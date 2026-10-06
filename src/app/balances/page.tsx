@@ -9,9 +9,9 @@ import {
     validateBalanceTransactionHistory,
     validateBalanceTransactionId,
 } from '@/app/lib/validation';
-import BalanceCard from '../components/ui/balancecard';
-import BalanceTransactionsTable from '../components/ui/balancetransactionstable';
-import BalancesControls from '../components/ui/BalancesControls';
+import BalanceCard from '../components/balances/balancecard';
+import BalanceTransactionsTable from '../components/balances/balancetransactionstable';
+import BalancesControls from '../components/balances/BalancesControls';
 import { ViewTransition } from 'react';
 
 export default async function Page(props: {

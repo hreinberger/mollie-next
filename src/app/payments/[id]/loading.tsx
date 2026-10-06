@@ -1,4 +1,4 @@
-import DetailSkeleton from '@/app/components/ui/DetailSkeleton';
+import DetailSkeleton from '@/app/components/shared/DetailSkeleton';
 
 export default function Loading() {
     return <DetailSkeleton heading="Payment Details" />;

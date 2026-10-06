@@ -2,9 +2,9 @@ import { Flex, Heading } from '@radix-ui/themes';
 import { getSession } from '@/app/lib/auth';
 import { mollieGetPayments } from '@/app/lib/mollie';
 import { validateMolliePayment } from '@/app/lib/validation';
-import PaymentsTable from '../components/ui/paymentstable';
-import PaymentCards from '../components/ui/PaymentCards';
-import PaymentsControls from '../components/ui/PaymentsControls';
+import PaymentsTable from '../components/payments/paymentstable';
+import PaymentCards from '../components/payments/PaymentCards';
+import PaymentsControls from '../components/payments/PaymentsControls';
 import { ViewTransition } from 'react';
 
 export default async function Page(props: {

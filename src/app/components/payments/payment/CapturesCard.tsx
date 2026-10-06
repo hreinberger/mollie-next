@@ -1,6 +1,6 @@
 import { Box, Card, Code, Flex, Heading, Separator, Table, Text, TextField } from '@radix-ui/themes';
-import StateBadge from '../orderstatebadge';
-import SubmitButton from '../submitbutton';
+import StateBadge from '../../shared/orderstatebadge';
+import SubmitButton from '../../shared/submitbutton';
 import { formatDateTime } from '@/app/lib/format';
 import { capturePayment, releaseAuthorization } from '@/app/lib/payment-actions';
 

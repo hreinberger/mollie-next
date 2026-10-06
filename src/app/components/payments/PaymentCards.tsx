@@ -1,8 +1,8 @@
 import { Card, Flex, Text } from '@radix-ui/themes';
 import { Payment } from '@mollie/api-client';
 import Link from 'next/link';
-import StateBadge from './orderstatebadge';
-import PaymentLogo from '../form/paymentlogo';
+import StateBadge from '../shared/orderstatebadge';
+import PaymentLogo from '../checkout/paymentlogo';
 import { formatDateTime } from '@/app/lib/format';
 
 export default function PaymentCards({

@@ -7,8 +7,8 @@ import React, { Suspense } from 'react';
 
 import MethodsSkeleton from './methodskeleton';
 import ComponentPaymentMethods from './componentpaymentmethods';
-import MollieV2Component from '@/app/components/form/methods/MollieV2Component';
-import AddressSourceToggle from '@/app/components/form/AddressSourceToggle';
+import MollieV2Component from '@/app/components/checkout/methods/MollieV2Component';
+import AddressSourceToggle from '@/app/components/checkout/AddressSourceToggle';
 
 import { CheckoutVariant, AddressSource } from '@/app/lib/types';
 

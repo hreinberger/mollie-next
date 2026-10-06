@@ -8,7 +8,7 @@ import DetailsCard from './payment/DetailsCard';
 import CapturesCard from './payment/CapturesCard';
 import RefundsCard from './payment/RefundsCard';
 import ChangeStateCard from './payment/ChangeStateCard';
-import RawJsonDump from './RawJsonDump';
+import RawJsonDump from '../shared/RawJsonDump';
 
 type CaptureRecord = {
     id: string;

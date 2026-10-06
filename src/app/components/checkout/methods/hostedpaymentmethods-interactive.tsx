@@ -9,7 +9,7 @@ import {
     RadioCards,
 } from '@radix-ui/themes';
 import React, { useState } from 'react';
-import PaymentLogo from '@/app/components/form/paymentlogo';
+import PaymentLogo from '@/app/components/checkout/paymentlogo';
 import {
     ALWAYS_AUTHORIZE_METHODS,
     OPTIONALLY_AUTHORIZE_METHODS,
