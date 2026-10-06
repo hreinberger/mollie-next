@@ -56,6 +56,11 @@ function getLocaleForCountry(country: string): Locale {
     return locale;
 }
 
+// Pick the test or live API client for a given mode
+function getClient(mode: 'test' | 'live' = 'test') {
+    return mode === 'live' ? livePaymentsClient : mollieClient;
+}
+
 // Create a payment using data gathered from the checkout form
 export async function mollieCreatePayment({
     firstname,
@@ -162,7 +167,7 @@ export async function mollieGetPayments(
     } = {},
 ) {
     const { mode = 'test', from, limit = 20 } = opts;
-    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const client = getClient(mode);
     const page = await client.payments.page({
         limit,
         ...(from ? { from } : {}),
@@ -175,10 +180,12 @@ export async function mollieGetPayments(
 }
 
 // only get the latest payment
-
 export async function mollieGetLatestPaymentStatus() {
-    const payment = await mollieClient.payments.page({ limit: 1 });
-    return payment[0].status;
+    const { payments } = await mollieGetPayments({ limit: 1 });
+    if (!payments[0]) {
+        throw new Error('No payments found');
+    }
+    return payments[0].status;
 }
 
 // Get a specific payment by its ID, with captures embedded
@@ -186,7 +193,7 @@ export async function mollieGetPayment(
     id: string,
     mode: 'test' | 'live' = 'test',
 ) {
-    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const client = getClient(mode);
     const payment = await client.payments.get(id, {
         embed: ['captures', 'refunds'],
     } as any);
@@ -225,7 +232,7 @@ export async function mollieCapturePayment(
     mode: 'test' | 'live' = 'test',
     amount?: { value: string; currency: string },
 ) {
-    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const client = getClient(mode);
     console.debug('Capturing payment with id: ' + id);
     const capture = await client.paymentCaptures.create({
         paymentId: id,
@@ -238,7 +245,7 @@ export async function mollieReleaseAuthorization(
     id: string,
     mode: 'test' | 'live' = 'test',
 ) {
-    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const client = getClient(mode);
     return client.payments.releaseAuthorization(id);
 }
 
@@ -247,7 +254,7 @@ export async function mollieRefundPayment(
     mode: 'test' | 'live' = 'test',
     amount: { value: string; currency: string },
 ) {
-    const client = mode === 'live' ? livePaymentsClient : mollieClient;
+    const client = getClient(mode);
     return client.paymentRefunds.create({ paymentId: id, amount });
 }
 

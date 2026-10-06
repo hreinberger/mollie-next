@@ -4,6 +4,18 @@ import { z } from 'zod';
 import { CaptureMethod } from '@mollie/api-client';
 import { ExtendedPaymentMethod, AddressSource } from './types';
 
+// Shared by every validator below: parse with the given schema, or throw a
+// one-line error with the given message. Keeping the original zod error
+// means losing its field-level detail, but these are all simple single-value
+// inputs (URL params, IDs) where a short message is enough.
+function parseOrThrow<T>(schema: z.ZodType<T>, value: unknown, message: string): T {
+    try {
+        return schema.parse(value);
+    } catch (error) {
+        throw new Error(`${message}: ${error}`);
+    }
+}
+
 export async function validateFormData(formData: FormData) {
     const form = Object.fromEntries(formData.entries());
 
@@ -32,42 +44,23 @@ export async function validateFormData(formData: FormData) {
         currency: z.string().length(3),
     });
 
-    try {
-        const result = formSchema.parse(form);
-        return result;
-    } catch (error) {
-        throw new Error(`Computer says no: ${error}`);
-    }
+    return parseOrThrow(formSchema, form, 'Computer says no');
 }
 
 export async function validateUrl(url: string) {
-    const urlSchema = z.url();
-    try {
-        const result = urlSchema.parse(url);
-        return result;
-    } catch (error) {
-        throw new Error(`No valid URL.`);
-    }
+    return parseOrThrow(z.url(), url, 'No valid URL');
 }
 
 export async function validateMolliePayment(id: string) {
-    const paymentSchema = z.string().startsWith('tr_');
-    try {
-        const result = paymentSchema.parse(id);
-        return result;
-    } catch (error) {
-        throw new Error(`No valid Mollie payment ID.`);
-    }
+    return parseOrThrow(
+        z.string().startsWith('tr_'),
+        id,
+        'No valid Mollie payment ID',
+    );
 }
 
 export async function validateCurrency(currency: string) {
-    const currencySchema = z.string().length(3);
-    try {
-        const result = currencySchema.parse(currency);
-        return result;
-    } catch (error) {
-        throw new Error(`No valid currency.`);
-    }
+    return parseOrThrow(z.string().length(3), currency, 'No valid currency');
 }
 
 export async function validateCaptureAmount(amount: string, max: string): Promise<string> {
@@ -83,21 +76,15 @@ export async function validateCaptureAmount(amount: string, max: string): Promis
             { message: `Amount must be between 0.01 and ${max}` },
         )
         .transform((s) => parseFloat(s).toFixed(2));
-    try {
-        return schema.parse(amount);
-    } catch (error) {
-        throw new Error(`Invalid capture amount: ${error}`);
-    }
+    return parseOrThrow(schema, amount, 'Invalid capture amount');
 }
 
 export async function validateCountry(country: string) {
-    const currencySchema = z.string().toUpperCase().length(2);
-    try {
-        const result = currencySchema.parse(country);
-        return result;
-    } catch (error) {
-        throw new Error(`No valid country.`);
-    }
+    return parseOrThrow(
+        z.string().toUpperCase().length(2),
+        country,
+        'No valid country',
+    );
 }
 
 // Whether the checkout should collect the billing address via our own form,
@@ -105,23 +92,18 @@ export async function validateCountry(country: string) {
 // 'form' on any invalid input rather than throwing, since this is a
 // non-critical UI toggle (unlike currency/country, which feed the payment).
 export async function validateAddressSource(value: string): Promise<AddressSource> {
-    const addressSourceSchema = z.enum(['form', 'session']);
-    try {
-        return addressSourceSchema.parse(value);
-    } catch (error) {
-        return 'form';
-    }
+    const result = z.enum(['form', 'session']).safeParse(value);
+    return result.success ? result.data : 'form';
 }
 
 // Used both for the `from` pagination cursor and for a balance transaction's
 // own ID in the detail route — both are the same `baltr_…` identifier.
 export async function validateBalanceTransactionId(id: string) {
-    const schema = z.string().startsWith('baltr_');
-    try {
-        return schema.parse(id);
-    } catch (error) {
-        throw new Error(`No valid Mollie balance transaction ID.`);
-    }
+    return parseOrThrow(
+        z.string().startsWith('baltr_'),
+        id,
+        'No valid Mollie balance transaction ID',
+    );
 }
 
 // The `history` query param on /balances is a client-maintained stack of
@@ -137,9 +119,5 @@ export async function validateBalanceTransactionHistory(
         .string()
         .transform((s) => s.split(','))
         .pipe(z.array(entrySchema));
-    try {
-        return schema.parse(value);
-    } catch (error) {
-        throw new Error(`No valid balance transaction history.`);
-    }
+    return parseOrThrow(schema, value, 'No valid balance transaction history');
 }
