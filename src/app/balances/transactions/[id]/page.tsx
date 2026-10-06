@@ -4,7 +4,7 @@ import { ViewTransition } from 'react';
 
 import { getSession } from '@/app/lib/auth';
 import { validateBalanceTransactionId } from '@/app/lib/validation';
-import BalanceTransactionOverview from '@/app/components/ui/balancetransactionoverview';
+import BalanceTransactionOverview from '@/app/components/balances/balancetransactionoverview';
 
 export default async function Page({
     params,

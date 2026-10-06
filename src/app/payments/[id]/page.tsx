@@ -4,7 +4,7 @@ import { ViewTransition } from 'react';
 
 import { validateMolliePayment } from '@/app/lib/validation';
 import { getSession } from '@/app/lib/auth';
-import PaymentOverview from '@/app/components/ui/paymentoverview';
+import PaymentOverview from '@/app/components/payments/paymentoverview';
 
 export default async function Page({
     params,

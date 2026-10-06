@@ -16,7 +16,7 @@ import {
 import React, { Suspense, useEffect } from 'react';
 import { useMollie } from '@/app/lib/MollieContext';
 import { IdCardIcon } from '@radix-ui/react-icons';
-import PaymentLogo from '@/app/components/form/paymentlogo';
+import PaymentLogo from '@/app/components/checkout/paymentlogo';
 
 export default function ComponentPaymentMethods() {
     const { mollie } = useMollie();

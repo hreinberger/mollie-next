@@ -7,10 +7,8 @@ import React, { Suspense } from 'react';
 
 import MethodsSkeleton from './methodskeleton';
 import ComponentPaymentMethods from './componentpaymentmethods';
-import SessionWrapper from '@/app/components/form/methods/SessionWrapper';
-import CardWrapperV2 from '@/app/components/form/methods/CardWrapperV2';
-import MethodsWrapperV2 from '@/app/components/form/methods/MethodsWrapperV2';
-import AddressSourceToggle from '@/app/components/form/AddressSourceToggle';
+import MollieV2Component from '@/app/components/checkout/methods/MollieV2Component';
+import AddressSourceToggle from '@/app/components/checkout/AddressSourceToggle';
 
 import { CheckoutVariant, AddressSource } from '@/app/lib/types';
 
@@ -144,8 +142,10 @@ export default function MethodSwitch({
                                     <Box pt="3">
                                         {!addressCollectedBySession && (
                                             <Tabs.Content value="methods">
-                                                <MethodsWrapperV2
+                                                <MollieV2Component
                                                     session={session}
+                                                    type="methods-component"
+                                                    elementId="methods-component"
                                                 />
                                             </Tabs.Content>
                                         )}
@@ -158,14 +158,18 @@ export default function MethodSwitch({
                                                 }
                                                 pending={addressSourcePending}
                                             />
-                                            <SessionWrapper
+                                            <MollieV2Component
                                                 session={session}
+                                                type="express-component"
+                                                elementId="express-component"
                                             />
                                         </Tabs.Content>
 
                                         <Tabs.Content value="card">
-                                            <CardWrapperV2
+                                            <MollieV2Component
                                                 session={session}
+                                                type="card-component"
+                                                elementId="mollie-component"
                                             />
                                         </Tabs.Content>
                                     </Box>

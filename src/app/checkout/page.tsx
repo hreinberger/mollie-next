@@ -1,10 +1,10 @@
 // import form server components
 // since the form itself must be a client component, we import the server components here
 // and pass them as props to the form
-import CheckoutForm from '../components/form/checkoutform';
-import Address from '../components/form/address';
-import HostedPaymentMethods from '../components/form/methods/hostedpaymentmethods';
-import MethodsSkeleton from '../components/form/methods/methodskeleton';
+import CheckoutForm from '../components/checkout/checkoutform';
+import Address from '../components/checkout/address';
+import HostedPaymentMethods from '../components/checkout/methods/hostedpaymentmethods';
+import MethodsSkeleton from '../components/checkout/methods/methodskeleton';
 
 // session handling for Express Components
 import { mollieCreateSession } from '../lib/mollie';

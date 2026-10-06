@@ -5,24 +5,12 @@ import {
     Code,
     DataList,
     Flex,
-    ScrollArea,
     Text,
 } from '@radix-ui/themes';
 import Link from 'next/link';
 import { mollieGetBalanceTransaction } from '@/app/lib/mollie';
-
-// The context object holds the related resource, e.g. { paymentId: 'tr_…' }.
-function contextId(context?: Record<string, unknown>) {
-    if (!context) return undefined;
-    const value = Object.values(context).find(
-        (v) => typeof v === 'string' && /^[a-z]+_/.test(v),
-    );
-    return value as string | undefined;
-}
-
-function formatAmount(amount?: { value: string; currency: string }) {
-    return amount ? `${amount.currency} ${amount.value}` : '—';
-}
+import { contextId, formatAmount, formatDateTime } from '@/app/lib/format';
+import RawJsonDump from '../shared/RawJsonDump';
 
 export default async function BalanceTransactionOverview({
     id,
@@ -48,13 +36,7 @@ export default async function BalanceTransactionOverview({
                             <DataList.Item>
                                 <DataList.Label>Created At</DataList.Label>
                                 <DataList.Value>
-                                    {new Date(transaction.createdAt).toLocaleString(
-                                        'de-DE',
-                                        {
-                                            dateStyle: 'medium',
-                                            timeStyle: 'short',
-                                        },
-                                    )}
+                                    {formatDateTime(transaction.createdAt)}
                                 </DataList.Value>
                             </DataList.Item>
                             <DataList.Item>
@@ -108,37 +90,7 @@ export default async function BalanceTransactionOverview({
             </Flex>
 
             {/* ── Raw balance transaction data — own card at the bottom ── */}
-            <Card>
-                <details>
-                    <summary style={{ cursor: 'pointer', userSelect: 'none' }}>
-                        <Text size="3" weight="bold">
-                            Raw Balance Transaction Data
-                        </Text>
-                    </summary>
-                    <Box
-                        mt="3"
-                        p="3"
-                        style={{
-                            background: 'var(--gray-a2)',
-                            borderRadius: 'var(--radius-2)',
-                        }}
-                    >
-                        <ScrollArea style={{ maxHeight: 600 }}>
-                            <Text size="1">
-                                <pre
-                                    style={{
-                                        margin: 0,
-                                        whiteSpace: 'pre-wrap',
-                                        wordBreak: 'break-word',
-                                    }}
-                                >
-                                    {JSON.stringify(transaction, null, 2)}
-                                </pre>
-                            </Text>
-                        </ScrollArea>
-                    </Box>
-                </details>
-            </Card>
+            <RawJsonDump label="Raw Balance Transaction Data" data={transaction} />
         </Flex>
     );
 }

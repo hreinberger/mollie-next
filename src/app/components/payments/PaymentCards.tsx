@@ -1,8 +1,9 @@
 import { Card, Flex, Text } from '@radix-ui/themes';
 import { Payment } from '@mollie/api-client';
 import Link from 'next/link';
-import StateBadge from './orderstatebadge';
-import PaymentLogo from '../form/paymentlogo';
+import StateBadge from '../shared/orderstatebadge';
+import PaymentLogo from '../checkout/paymentlogo';
+import { formatDateTime } from '@/app/lib/format';
 
 export default function PaymentCards({
     payments,
@@ -33,10 +34,7 @@ export default function PaymentCards({
                                     {payment.amount.currency} {payment.amount.value}
                                 </Text>
                                 <Text size="1" color="gray">
-                                    {new Date(payment.createdAt).toLocaleString('de-DE', {
-                                        dateStyle: 'medium',
-                                        timeStyle: 'short',
-                                    })}
+                                    {formatDateTime(payment.createdAt)}
                                 </Text>
                             </Flex>
                             <Text size="1" color="gray">

@@ -52,11 +52,15 @@ declare global {
             profileId: string,
             options: { locale: string; testmode: boolean },
         ) => MollieInstance;
-        // the new Mollie object for express components
-        Mollie2: (
-            clientAccessToken: string,
-            options: { locale: string },
-        ) => MollieExpressInstance;
+        // the new Mollie object for express components. Confusingly, unlike
+        // Mollie() above, Mollie2 is not itself callable — it exposes a
+        // .Checkout() factory function instead.
+        Mollie2: {
+            Checkout: (
+                clientAccessToken: string,
+                options: { locale: string },
+            ) => MollieExpressInstance;
+        };
     }
 }
 

@@ -1,9 +1,6 @@
 import { Badge, Card, DataList, Flex, Heading, Text } from '@radix-ui/themes';
 import { Balance } from '@/app/lib/types';
-
-function formatAmount(amount?: { value: string; currency: string }) {
-    return amount ? `${amount.currency} ${amount.value}` : '—';
-}
+import { formatAmount } from '@/app/lib/format';
 
 export default function BalanceCard({ balance }: { balance: Balance }) {
     return (

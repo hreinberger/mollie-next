@@ -3,11 +3,11 @@ import './globals.css';
 import { Suspense } from 'react';
 import { Theme, ThemePanel, Container, Section } from '@radix-ui/themes';
 
-import Navbar from '@/app/components/ui/navbar.js';
-import Footer from '@/app/components/ui/footer.js';
-import { Providers } from '@/app/components/ui/providers.jsx';
-import { Toaster } from '@/app/components/ui/toaster';
-import PaymentToastListener from '@/app/components/ui/PaymentToastListener';
+import Navbar from '@/app/components/layout/navbar.js';
+import Footer from '@/app/components/layout/footer.js';
+import { Providers } from '@/app/components/layout/providers.jsx';
+import { Toaster } from '@/app/components/layout/toaster';
+import PaymentToastListener from '@/app/components/payments/PaymentToastListener';
 import Script from 'next/script';
 
 import { MollieProvider } from './lib/MollieContext';

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { mollieGetLatestPaymentStatus } from '../lib/mollie';
-import StateBadge from '../components/ui/orderstatebadge';
+import StateBadge from '../components/shared/orderstatebadge';
 
 // Dynamically import the confetti component to avoid SSR issues
 const ReactConfetti = dynamic(() => import('react-confetti'), { ssr: false });

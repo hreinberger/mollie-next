@@ -3,8 +3,6 @@
 // Lib
 import { validateFormData, validateUrl } from '@/app/lib/validation';
 import { mollieCreatePayment } from '@/app/lib/mollie';
-import { PaymentMethod, CaptureMethod } from '@mollie/api-client';
-import { ExtendedPaymentMethodType } from '@/app/lib/types';
 
 // Next.js
 import { redirect } from 'next/navigation';
@@ -12,20 +10,7 @@ import { redirect } from 'next/navigation';
 export async function createPayment(formData: FormData) {
     // This Server Action takes the form data, validates it and creates a payment
     // Always validate user input
-    const validatedForm: {
-        firstname: string;
-        lastname: string;
-        company?: string;
-        email: string;
-        address: string;
-        city: string;
-        zip_code: string;
-        country: string;
-        payment_method: ExtendedPaymentMethodType;
-        cardToken?: string;
-        captureMode?: CaptureMethod;
-        currency: string;
-    } = await validateFormData(formData);
+    const validatedForm = await validateFormData(formData);
 
     // Create a payment with the validated form data and retrieve the redirect URL
     const mollieRedirectUrl: string | null = await mollieCreatePayment(
