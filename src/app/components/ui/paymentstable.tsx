@@ -4,6 +4,7 @@ import { Payment } from '@mollie/api-client';
 import Link from 'next/link';
 import StateBadge from './orderstatebadge';
 import PaymentLogo from '../form/paymentlogo';
+import { formatDateTime } from '@/app/lib/format';
 
 export default function PaymentsTable({
     payments,
@@ -51,10 +52,7 @@ export default function PaymentsTable({
                                 </Flex>
                             </Table.Cell>
                             <Table.Cell>
-                                {new Date(payment.createdAt).toLocaleString('de-DE', {
-                                    dateStyle: 'medium',
-                                    timeStyle: 'short',
-                                })}
+                                {formatDateTime(payment.createdAt)}
                             </Table.Cell>
                             <Table.Cell>
                                 {payment.amount.currency} {payment.amount.value}

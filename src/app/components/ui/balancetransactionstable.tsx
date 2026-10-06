@@ -2,15 +2,7 @@ import { Badge, Flex, IconButton, Table, Text } from '@radix-ui/themes';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { BalanceTransaction } from '@/app/lib/types';
-
-// The context object holds the related resource, e.g. { paymentId: 'tr_…' }.
-function contextId(context?: Record<string, unknown>) {
-    if (!context) return undefined;
-    const value = Object.values(context).find(
-        (v) => typeof v === 'string' && /^[a-z]+_/.test(v),
-    );
-    return value as string | undefined;
-}
+import { contextId, formatDateTime } from '@/app/lib/format';
 
 export default function BalanceTransactionsTable({
     transactions,
@@ -49,10 +41,7 @@ export default function BalanceTransactionsTable({
                                 className="hover:bg-zinc-100 dark:hover:bg-zinc-800"
                             >
                                 <Table.Cell>
-                                    {new Date(tx.createdAt).toLocaleString('de-DE', {
-                                        dateStyle: 'medium',
-                                        timeStyle: 'short',
-                                    })}
+                                    {formatDateTime(tx.createdAt)}
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Badge variant="soft">{tx.type}</Badge>
