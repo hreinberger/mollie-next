@@ -1,34 +1,10 @@
 'use client';
 
 import { Select, Text } from '@radix-ui/themes';
-
-import { useState } from 'react';
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useUrlSyncedState } from '@/app/lib/hooks';
 
 export default function SelectCountry() {
-    const [country, setCountry] = useState('DE');
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const { replace } = useRouter();
-
-    // Check if country is in the URL
-    const urlCountry = searchParams.get('country');
-    if (urlCountry && urlCountry !== country) {
-        setCountry(urlCountry);
-    }
-
-    function handleCountryChange(country: string) {
-        setCountry(country);
-        const params = new URLSearchParams(searchParams);
-        if (country) {
-            params.set('country', country);
-        } else {
-            params.delete('country');
-        }
-        replace(`${pathname}?${params.toString()}`, {
-            scroll: false,
-        });
-    }
+    const [country, handleCountryChange] = useUrlSyncedState('country', 'DE');
 
     return (
         <>

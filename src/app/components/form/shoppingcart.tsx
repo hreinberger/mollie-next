@@ -1,8 +1,7 @@
 'use client';
 
 import { Flex, Heading, Text, Card, Table, Select } from '@radix-ui/themes';
-import { useState } from 'react';
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useUrlSyncedState } from '@/app/lib/hooks';
 
 // Currency symbols
 const CURRENCY_SYMBOLS = {
@@ -39,31 +38,7 @@ const PRODUCTS = [
 ];
 
 export default function ShoppingCart() {
-    const [currency, setCurrency] = useState('EUR');
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const { replace } = useRouter();
-
-    // Check if currency is in the URL
-    const urlCurrency = searchParams.get('currency');
-    if (urlCurrency && urlCurrency !== currency) {
-        setCurrency(urlCurrency);
-    }
-
-    // when the currency changes, store it in the URL
-    // and update the state
-    function handleCurrencyChange(currency: string) {
-        setCurrency(currency);
-        const params = new URLSearchParams(searchParams);
-        if (currency) {
-            params.set('currency', currency);
-        } else {
-            params.delete('currency');
-        }
-        replace(`${pathname}?${params.toString()}`, {
-            scroll: false,
-        });
-    }
+    const [currency, handleCurrencyChange] = useUrlSyncedState('currency', 'EUR');
 
     // Format price with the selected currency symbol
     const formatPrice = (price: number) => {
