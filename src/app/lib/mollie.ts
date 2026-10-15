@@ -1,63 +1,53 @@
 'use server';
 
-import createMollieClient, {
-    CaptureMethod,
-    Locale,
-    Payment,
-    SequenceType,
-    PaymentLineCategory,
-} from '@mollie/api-client';
-import {
-    CreatePaymentParams,
-    ALWAYS_AUTHORIZE_METHODS,
-    ShippingOption,
-    Balance,
-    BalanceTransaction,
-} from './types';
+import { Client } from 'mollie-api-typescript';
+import type { Locale2 } from 'mollie-api-typescript/models';
+import { CreatePaymentParams, ALWAYS_AUTHORIZE_METHODS, ShippingOption } from './types';
 
-const apiKey = process.env.MOLLIE_API_KEY;
-const liveApiKey = process.env.MOLLIE_LIVE_API_KEY;
+const accessToken = process.env.MOLLIE_ACCESS_TOKEN;
+const profileId = process.env.NEXT_PUBLIC_MOLLIE_PROFILE;
 const domain = process.env.DOMAIN || 'http://localhost:3000';
 const webhookUrl = process.env.WEBHOOK_URL || 'http://not.provided';
 
-if (!apiKey) {
-    throw new Error('MOLLIE_API_KEY is not defined');
+if (!accessToken) {
+    throw new Error('MOLLIE_ACCESS_TOKEN is not defined');
 }
 
-if (!liveApiKey) {
-    throw new Error('MOLLIE_LIVE_API_KEY is not defined');
+if (!profileId) {
+    throw new Error('NEXT_PUBLIC_MOLLIE_PROFILE is not defined');
 }
 
-// Set up Mollie API client
-const mollieClient = createMollieClient({ apiKey: apiKey });
-const livePaymentsClient = createMollieClient({ apiKey: liveApiKey! });
+// One organization access token covers test payments, live payments,
+// Sessions and Balances. The SDK injects profileId into every request that
+// needs it; test vs live is chosen per request with the testmode flag.
+const mollieClient = new Client({
+    security: { advancedAccessToken: accessToken },
+    profileId,
+});
 
 // translate countries to locales
-const countryToLocale: Record<string, Locale> = {
-    DE: Locale.de_DE,
-    AT: Locale.de_AT,
-    NL: Locale.nl_NL,
-    FR: Locale.fr_FR,
-    UK: Locale.en_US,
-    SE: Locale.sv_SE,
-    PT: Locale.pt_PT,
-    IT: Locale.it_IT,
-    CH: Locale.de_CH,
-    ES: Locale.es_ES,
+const countryToLocale: Record<string, Locale2> = {
+    DE: 'de_DE',
+    AT: 'de_AT',
+    NL: 'nl_NL',
+    FR: 'fr_FR',
+    UK: 'en_US',
+    SE: 'sv_SE',
+    PT: 'pt_PT',
+    IT: 'it_IT',
+    CH: 'de_CH',
+    ES: 'es_ES',
 };
 
 // function to get the locale for a given country
-function getLocaleForCountry(country: string): Locale {
-    let locale = countryToLocale[country];
-    if (!locale) {
-        locale = Locale.en_US; // default to English if country is not found
-    }
-    return locale;
+function getLocaleForCountry(country: string): Locale2 {
+    return countryToLocale[country] ?? 'en_US'; // default to English if country is not found
 }
 
-// Pick the test or live API client for a given mode
-function getClient(mode: 'test' | 'live' = 'test') {
-    return mode === 'live' ? livePaymentsClient : mollieClient;
+// Extract the `from` cursor out of a pagination link
+function cursorFromLink(link?: { href?: string } | null): string | undefined {
+    if (!link?.href) return undefined;
+    return new URL(link.href).searchParams.get('from') ?? undefined;
 }
 
 // Create a payment using data gathered from the checkout form
@@ -75,87 +65,85 @@ export async function mollieCreatePayment({
     captureMode,
     currency,
 }: CreatePaymentParams) {
-    // Note: We allow beta payment methods to be sent to the API
-    // The Mollie API will handle validation and return appropriate errors if needed
-    // This allows testing of beta payment methods that aren't in the TypeScript client yet
-
     // These methods always require manual capture regardless of client input
-    if (ALWAYS_AUTHORIZE_METHODS.includes(payment_method as any)) {
-        captureMode = CaptureMethod.manual;
+    if ((ALWAYS_AUTHORIZE_METHODS as readonly string[]).includes(payment_method)) {
+        captureMode = 'manual';
     }
 
     // set up the actual payment with mollie library
-    const payment: Payment = await mollieClient.payments.create({
-        amount: {
-            currency: currency,
-            value: '220.00',
-        },
-        billingAddress: {
-            givenName: firstname,
-            familyName: lastname,
-            organizationName: company,
-            streetAndNumber: address,
-            postalCode: zip_code,
-            city: city,
-            country: country,
-            email: email,
-        },
-        metadata: {
-            internal_payment_id: 'mollie-next-' + Date.now(),
-        },
-        lines: [
-            {
-                description: 'An expensive product',
-                quantity: 1,
-                unitPrice: {
-                    currency: currency,
-                    value: '200.00',
-                },
-                totalAmount: {
-                    currency: currency,
-                    value: '200.00',
-                },
+    const payment = await mollieClient.payments.create({
+        paymentRequest: {
+            amount: {
+                currency: currency,
+                value: '220.00',
             },
-            {
-                description: 'A cheap product',
-                quantity: 1,
-                unitPrice: {
-                    currency: currency,
-                    value: '10.00',
-                },
-                totalAmount: {
-                    currency: currency,
-                    value: '10.00',
-                },
-                // categories for voucher payments
-                categories: [PaymentLineCategory.gift, PaymentLineCategory.eco],
+            billingAddress: {
+                givenName: firstname,
+                familyName: lastname,
+                organizationName: company,
+                streetAndNumber: address,
+                postalCode: zip_code,
+                city: city,
+                country: country,
+                email: email,
             },
-            {
-                description: 'Another cheap product',
-                quantity: 1,
-                unitPrice: {
-                    currency: currency,
-                    value: '10.00',
-                },
-                totalAmount: {
-                    currency: currency,
-                    value: '10.00',
-                },
-                // categories for voucher payments
-                categories: [PaymentLineCategory.gift, PaymentLineCategory.eco],
+            metadata: {
+                internal_payment_id: 'mollie-next-' + Date.now(),
             },
-        ],
-        description: 'Demo payment from ' + firstname,
-        redirectUrl: domain + '/success',
-        cancelUrl: domain,
-        webhookUrl: webhookUrl,
-        method: payment_method as any, // Allow beta payment methods to be sent to API
-        cardToken: cardToken,
-        captureMode: captureMode,
-        locale: getLocaleForCountry(country),
+            lines: [
+                {
+                    description: 'An expensive product',
+                    quantity: 1,
+                    unitPrice: {
+                        currency: currency,
+                        value: '200.00',
+                    },
+                    totalAmount: {
+                        currency: currency,
+                        value: '200.00',
+                    },
+                },
+                {
+                    description: 'A cheap product',
+                    quantity: 1,
+                    unitPrice: {
+                        currency: currency,
+                        value: '10.00',
+                    },
+                    totalAmount: {
+                        currency: currency,
+                        value: '10.00',
+                    },
+                    // categories for voucher payments
+                    categories: ['gift', 'eco'],
+                },
+                {
+                    description: 'Another cheap product',
+                    quantity: 1,
+                    unitPrice: {
+                        currency: currency,
+                        value: '10.00',
+                    },
+                    totalAmount: {
+                        currency: currency,
+                        value: '10.00',
+                    },
+                    // categories for voucher payments
+                    categories: ['gift', 'eco'],
+                },
+            ],
+            description: 'Demo payment from ' + firstname,
+            redirectUrl: domain + '/success',
+            cancelUrl: domain,
+            webhookUrl: webhookUrl,
+            method: payment_method,
+            cardToken: cardToken,
+            captureMode: captureMode,
+            locale: getLocaleForCountry(country),
+            testmode: true,
+        },
     });
-    const redirectUrl = payment.getCheckoutUrl();
-    return redirectUrl;
+    return payment.links.checkout?.href;
 }
 
 export async function mollieGetPayments(
@@ -166,15 +154,17 @@ export async function mollieGetPayments(
     } = {},
 ) {
     const { mode = 'test', from, limit = 20 } = opts;
-    const client = getClient(mode);
-    const page = await client.payments.page({
+    // list() returns a page iterator; we only need the first page because
+    // paging is driven by the `from` cursor in the URL.
+    const { result } = await mollieClient.payments.list({
         limit,
-        ...(from ? { from } : {}),
+        from,
+        testmode: mode === 'test',
     });
     return {
-        payments: Array.from(page),
-        nextPageCursor: page.nextPageCursor,
-        previousPageCursor: page.previousPageCursor,
+        payments: result.embedded.payments ?? [],
+        nextPageCursor: cursorFromLink(result.links.next),
+        previousPageCursor: cursorFromLink(result.links.previous),
     };
 }
 
@@ -187,16 +177,25 @@ export async function mollieGetLatestPaymentStatus() {
     return payments[0].status;
 }
 
-// Get a specific payment by its ID, with captures embedded
+// Get a specific payment by its ID, together with its captures and refunds.
+// The SDK's response schema has no `_embedded` field (unknown keys are
+// stripped during validation), so `embed=captures,refunds` would be lost —
+// fetch the two lists alongside the payment instead.
 export async function mollieGetPayment(
     id: string,
     mode: 'test' | 'live' = 'test',
 ) {
-    const client = getClient(mode);
-    const payment = await client.payments.get(id, {
-        embed: ['captures', 'refunds'],
-    } as any);
-    return payment;
+    const testmode = mode === 'test';
+    const [payment, captures, refunds] = await Promise.all([
+        mollieClient.payments.get({ paymentId: id, testmode }),
+        mollieClient.captures.list({ paymentId: id, testmode }),
+        mollieClient.refunds.list({ paymentId: id, testmode }),
+    ]);
+    return {
+        payment,
+        captures: captures.result.embedded.captures,
+        refunds: refunds.result.embedded.refunds,
+    };
 }
 
 // Get the available payment methods in the checkout
@@ -207,8 +206,7 @@ export async function mollieGetMethods(
     currency: string = 'EUR',
     country: string = 'DE',
 ) {
-    let locale = Locale.en_US;
-    locale = getLocaleForCountry(country);
+    const locale = getLocaleForCountry(country);
     console.debug(
         'Retrieving payment methods for combination: ' +
             country +
@@ -217,35 +215,36 @@ export async function mollieGetMethods(
             ' ' +
             currency,
     );
-    const methods = await mollieClient.methods.list({
-        sequenceType: SequenceType.oneoff,
+    const { embedded } = await mollieClient.methods.list({
+        sequenceType: 'oneoff',
         locale: locale,
         resource: 'payments',
         amount: { currency: currency, value: '220.00' },
         billingCountry: country,
+        testmode: true,
     });
-    return methods;
+    return embedded.methods;
 }
 export async function mollieCapturePayment(
     id: string,
     mode: 'test' | 'live' = 'test',
     amount?: { value: string; currency: string },
 ) {
-    const client = getClient(mode);
     console.debug('Capturing payment with id: ' + id);
-    const capture = await client.paymentCaptures.create({
+    return mollieClient.captures.create({
         paymentId: id,
-        ...(amount ? { amount } : {}),
+        entityCapture: { ...(amount ? { amount } : {}), testmode: mode === 'test' },
     });
-    return capture;
 }
 
 export async function mollieReleaseAuthorization(
     id: string,
     mode: 'test' | 'live' = 'test',
 ) {
-    const client = getClient(mode);
-    return client.payments.releaseAuthorization(id);
+    return mollieClient.payments.releaseAuthorization({
+        paymentId: id,
+        requestBody: { testmode: mode === 'test' },
+    });
 }
 
 export async function mollieRefundPayment(
@@ -253,14 +252,16 @@ export async function mollieRefundPayment(
     mode: 'test' | 'live' = 'test',
     amount: { value: string; currency: string },
 ) {
-    const client = getClient(mode);
-    return client.paymentRefunds.create({ paymentId: id, amount });
+    return mollieClient.refunds.create({
+        paymentId: id,
+        refundRequest: { amount, testmode: mode === 'test' },
+    });
 }
 
 // mollieCreateSession creates a Mollie Session, which is the starting point for
 // Express Components. The session returns a clientAccessToken that is passed to
 // the client-side Mollie2.Checkout() initializer in MollieV2Component.
-// Sessions use the live API key because Express Components only work in live mode.
+// Sessions run in live mode because Express Components only work in live mode.
 //
 // payment.webhookUrl is set so it carries over to the Payment the Session
 // creates automatically — this is how we still get notified for fulfilment.
@@ -280,13 +281,8 @@ export async function mollieCreateSession(
     shippingOptions?: ShippingOption[],
 ) {
     try {
-        const session = await fetch('https://api.mollie.com/v2/sessions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + liveApiKey,
-            },
-            body: JSON.stringify({
+        const session = await mollieClient.checkoutSessions.create({
+            sessionRequest: {
                 description: 'Order #1234',
                 amount: {
                     value: '0.02',
@@ -316,80 +312,37 @@ export async function mollieCreateSession(
                         },
                     },
                 ],
-            }),
+                testmode: false,
+            },
         });
-
-        if (!session.ok) {
-            throw new Error(
-                `Failed to create session: ${session.status} ${session.statusText}`,
-            );
-        }
-
-        const { id, clientAccessToken } = await session.json();
-        return { sessionId: id, clientAccessToken: clientAccessToken };
+        return {
+            sessionId: session.id,
+            clientAccessToken: session.clientAccessToken,
+        };
     } catch (error) {
         console.error('Error creating Mollie session:', error);
         throw error;
     }
 }
 
-// Balances API — live mode only, and not part of @mollie/api-client 4.x,
-// so these call the REST API directly. Profile API keys get a 403 here; the
-// endpoint needs an organization access token (access_…).
-async function mollieLiveGet<T>(path: string): Promise<T> {
-    const accessToken = process.env.MOLLIE_ACCESS_TOKEN;
-    if (!accessToken) {
-        throw new Error('MOLLIE_ACCESS_TOKEN is not set');
-    }
-    const response = await fetch('https://api.mollie.com/v2' + path, {
-        headers: { Authorization: 'Bearer ' + accessToken },
-        cache: 'no-store',
-    });
-    if (!response.ok) {
-        const body = await response.text();
-        // Logged as an object, not a template literal with trailing args —
-        // `path` is influenced by caller-supplied IDs, and console.error
-        // treats a string first argument as a util.format format string.
-        // A path containing e.g. "%s" would otherwise consume `body` as a
-        // substitution and garble the log (CodeQL js/tainted-format-string).
-        console.error('Mollie GET failed', {
-            path,
-            status: response.status,
-            body,
-        });
-        throw new Error(`Mollie GET ${path} failed with ${response.status}`);
-    }
-    return response.json() as Promise<T>;
-}
-
-function cursorFromLink(link?: { href: string } | null): string | undefined {
-    if (!link?.href) return undefined;
-    return new URL(link.href).searchParams.get('from') ?? undefined;
-}
-
+// Balances API — live mode only.
 export async function mollieGetPrimaryBalance() {
-    return mollieLiveGet<Balance>('/balances/primary');
+    return mollieClient.balances.getPrimary();
 }
 
 export async function mollieGetBalanceTransactions(
     opts: { balanceId?: string; from?: string; limit?: number } = {},
 ) {
     const { balanceId = 'primary', from, limit = 20 } = opts;
-    const params = new URLSearchParams({ limit: String(limit) });
-    if (from) params.set('from', from);
-
-    // Note: we only request `next` from the API — see nextPageCursor below.
-    const data = await mollieLiveGet<{
-        _embedded: { balance_transactions: BalanceTransaction[] };
-        _links: {
-            next?: { href: string } | null;
-            previous?: { href: string } | null;
-        };
-    }>(`/balances/${encodeURIComponent(balanceId)}/transactions?${params}`);
+    const { result } = await mollieClient.balances.listTransactions({
+        balanceId,
+        from,
+        limit,
+    });
 
     return {
-        transactions: data._embedded.balance_transactions,
-        nextPageCursor: cursorFromLink(data._links.next),
+        transactions: result.embedded.balanceTransactions,
+        nextPageCursor: cursorFromLink(result.links.next),
         // Deliberately not exposing a `previousPageCursor`: verified against
         // the live API that `_links.previous` on this endpoint is always
         // null, even several pages deep — Mollie just doesn't provide
@@ -397,7 +350,6 @@ export async function mollieGetBalanceTransactions(
         // itself via a history stack in the URL instead of relying on this.
     };
 }
-
 // The Balances API has no "get single transaction" endpoint — only the list
 // above. `from` is documented as inclusive ("start from the item with the
 // given ID and onwards"), so asking for exactly one result starting at this

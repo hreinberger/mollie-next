@@ -13,7 +13,7 @@ export async function createPayment(formData: FormData) {
     const validatedForm = await validateFormData(formData);
 
     // Create a payment with the validated form data and retrieve the redirect URL
-    const mollieRedirectUrl: string | null = await mollieCreatePayment(
+    const mollieRedirectUrl = await mollieCreatePayment(
         validatedForm
     );
     if (!mollieRedirectUrl) {

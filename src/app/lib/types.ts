@@ -1,31 +1,30 @@
 import { ReactNode } from 'react';
-import { CaptureMethod, PaymentMethod } from '@mollie/api-client';
+import {
+    CaptureMode,
+    MethodEnum,
+    type EntityBalance,
+    type EntityBalanceTransaction,
+    type SessionRequestOption1,
+} from 'mollie-api-typescript/models';
 import { z } from 'zod';
 
-// Extended payment methods to include beta/testing methods
-export const ExtendedPaymentMethod = z.enum([
-    ...Object.values(PaymentMethod),
-    // Add beta payment methods here for testing
-    'bizum',
-    'vippsmobilepay',
-    'billink',
-    'wero',
-] as const);
+// Payment methods accepted by the API. The SDK is generated from the API
+// spec, so beta methods appear here as soon as Mollie publishes them.
+export const PaymentMethodSchema = z.enum(MethodEnum);
+export type PaymentMethodType = z.infer<typeof PaymentMethodSchema>;
 
-// Export the type for use in other files
-export type ExtendedPaymentMethodType = z.infer<typeof ExtendedPaymentMethod>;
+export const CaptureModeSchema = z.enum(CaptureMode);
 
-export const ALWAYS_AUTHORIZE_METHODS = ['billink', 'riverty'] as const;
+export const ALWAYS_AUTHORIZE_METHODS: readonly PaymentMethodType[] = ['billink', 'riverty'];
 
-export const OPTIONALLY_AUTHORIZE_METHODS = [
+export const OPTIONALLY_AUTHORIZE_METHODS: readonly PaymentMethodType[] = [
     'creditcard',
     'klarna',
     'billie',
     'vipps',
-    'vippsmobilepay',
     'mobilepay',
     'paypal',
-] as const;
+];
 
 // Mollie Context types
 export type MollieInstance = {
@@ -86,9 +85,9 @@ export type CreatePaymentParams = {
     city: string;
     zip_code: string;
     country: string;
-    payment_method: ExtendedPaymentMethodType;
+    payment_method: PaymentMethodType;
     cardToken?: string;
-    captureMode?: CaptureMethod;
+    captureMode?: CaptureMode;
     currency: string;
 };
 
@@ -109,14 +108,7 @@ export type ExpressSession = {
 // A selectable delivery option offered by the Express Checkout session when
 // address collection is delegated to Mollie. See shippingOptions on
 // mollieCreateSession.
-export type ShippingOption = {
-    reference: string;
-    description: string;
-    amount: {
-        currency: string;
-        value: string;
-    };
-};
+export type ShippingOption = SessionRequestOption1;
 
 // Fixed demo shipping options offered once address collection is delegated to
 // the session.
@@ -135,34 +127,6 @@ export function getFixedShippingOptions(currency: string): ShippingOption[] {
     ];
 }
 
-// Balances API types (not covered by @mollie/api-client 4.x)
-export type MollieAmount = { value: string; currency: string };
-
-export type Balance = {
-    id: string;
-    mode: 'live' | 'test';
-    createdAt: string;
-    currency: string;
-    description?: string;
-    status: 'active' | 'inactive';
-    transferFrequency?: string;
-    transferThreshold?: MollieAmount;
-    transferReference?: string | null;
-    transferDestination?: {
-        type: string;
-        beneficiaryName?: string;
-        bankAccount?: string;
-    } | null;
-    availableAmount: MollieAmount;
-    pendingAmount: MollieAmount;
-};
-
-export type BalanceTransaction = {
-    id: string;
-    type: string;
-    resultAmount: MollieAmount;
-    initialAmount: MollieAmount;
-    deductions?: MollieAmount;
-    context?: Record<string, unknown>;
-    createdAt: string;
-};
+// Balances API types
+export type Balance = EntityBalance;
+export type BalanceTransaction = EntityBalanceTransaction;

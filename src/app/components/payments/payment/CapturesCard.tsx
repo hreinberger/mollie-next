@@ -1,15 +1,10 @@
 import { Box, Card, Code, Flex, Heading, Separator, Table, Text, TextField } from '@radix-ui/themes';
+import type { ListCaptureResponse } from 'mollie-api-typescript/models';
 import StateBadge from '../../shared/orderstatebadge';
 import SubmitButton from '../../shared/submitbutton';
-import { formatDateTime } from '@/app/lib/format';
+import { formatAmount, formatDateTime } from '@/app/lib/format';
 import { capturePayment, releaseAuthorization } from '@/app/lib/payment-actions';
 
-type CaptureRecord = {
-    id: string;
-    status: string;
-    amount: { value: string; currency: string };
-    createdAt: string;
-};
 
 export default function CapturesCard({
     id,
@@ -24,7 +19,7 @@ export default function CapturesCard({
     currency: string;
     remaining: string;
     canCapture: boolean;
-    captures: CaptureRecord[];
+    captures: ListCaptureResponse[];
 }) {
     const boundCapturePayment = capturePayment.bind(null, id, mode, remaining, currency);
     const boundReleaseAuthorization = releaseAuthorization.bind(null, id, mode);
@@ -55,7 +50,7 @@ export default function CapturesCard({
                                         </Code>
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {capture.amount.value} {capture.amount.currency}
+                                        {formatAmount(capture.amount ?? undefined)}
                                     </Table.Cell>
                                     <Table.Cell>
                                         <StateBadge state={capture.status} />

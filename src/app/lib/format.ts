@@ -19,7 +19,7 @@ export function formatAmount(amount?: {
 
 // A balance transaction's `context` object holds the related resource, e.g.
 // { paymentId: 'tr_…' }. This pulls out that id regardless of its key name.
-export function contextId(context?: Record<string, unknown>): string | undefined {
+export function contextId(context?: object | null): string | undefined {
     if (!context) return undefined;
     const value = Object.values(context).find(
         (v) => typeof v === 'string' && /^[a-z]+_/.test(v),

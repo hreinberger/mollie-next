@@ -1,6 +1,6 @@
 import { Flex, Table, IconButton } from '@radix-ui/themes';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { Payment } from '@mollie/api-client';
+import type { ListPaymentResponse } from 'mollie-api-typescript/models';
 import Link from 'next/link';
 import StateBadge from '../shared/orderstatebadge';
 import PaymentLogo from '../checkout/paymentlogo';
@@ -10,7 +10,7 @@ export default function PaymentsTable({
     payments,
     mode = 'test',
 }: {
-    payments: Payment[];
+    payments: ListPaymentResponse[];
     mode?: 'test' | 'live';
 }) {
     return (
