@@ -3,33 +3,11 @@
 import { Flex } from '@radix-ui/themes';
 
 import { mollieGetPayment } from '@/app/lib/mollie';
-import { Payment } from '@mollie/api-client';
 import DetailsCard from './payment/DetailsCard';
 import CapturesCard from './payment/CapturesCard';
 import RefundsCard from './payment/RefundsCard';
 import ChangeStateCard from './payment/ChangeStateCard';
 import RawJsonDump from '../shared/RawJsonDump';
-
-type CaptureRecord = {
-    id: string;
-    status: string;
-    amount: { value: string; currency: string };
-    createdAt: string;
-};
-
-type RefundRecord = {
-    id: string;
-    status: string;
-    amount: { value: string; currency: string };
-    createdAt: string;
-};
-
-type PaymentWithEmbedded = Payment & {
-    _embedded?: {
-        captures?: CaptureRecord[];
-        refunds?: RefundRecord[];
-    };
-};
 
 export default async function PaymentOverview({
     id,
@@ -38,9 +16,7 @@ export default async function PaymentOverview({
     id: string;
     mode: 'test' | 'live';
 }) {
-    const payment = (await mollieGetPayment(id, mode)) as PaymentWithEmbedded;
-    const captures: CaptureRecord[] = payment._embedded?.captures ?? [];
-    const refunds: RefundRecord[] = payment._embedded?.refunds ?? [];
+    const { payment, captures, refunds } = await mollieGetPayment(id, mode);
 
     // amountRemaining is present once any capture/refund activity has occurred.
     // For a fresh authorized payment it is absent, so fall back to amount − amountCaptured.
@@ -63,12 +39,8 @@ export default async function PaymentOverview({
     const showRefundsSection =
         payment.status === 'paid' || refunds.length > 0;
 
-    const changePaymentStateUrl = (payment as any)._links?.changePaymentState?.href as string | undefined;
+    const changePaymentStateUrl = payment.links.changePaymentState?.href;
     const canChangePaymentState = payment.status === 'pending' && !!changePaymentStateUrl;
-
-    const billingAddress = (payment as any).billingAddress;
-    const lines = (payment as any).lines;
-    const metadata = (payment as any).metadata as Record<string, unknown> | undefined;
 
     return (
         <Flex direction="column" pt="4" gap="4">
@@ -81,9 +53,6 @@ export default async function PaymentOverview({
             >
                 <DetailsCard
                     payment={payment}
-                    billingAddress={billingAddress}
-                    lines={lines}
-                    metadata={metadata}
                 />
 
                 {(showCapturesSection || showRefundsSection || canChangePaymentState) && (

@@ -1,8 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { CaptureMethod } from '@mollie/api-client';
-import { ExtendedPaymentMethod, AddressSource } from './types';
+import { PaymentMethodSchema, CaptureModeSchema, AddressSource } from './types';
 
 // Shared by every validator below: parse with the given schema, or throw a
 // one-line error with the given message. Keeping the original zod error
@@ -38,9 +37,9 @@ export async function validateFormData(formData: FormData) {
             .string()
             .min(1, { message: 'Must be at least 1 character long.' }),
         country: z.string().toUpperCase().length(2),
-        payment_method: ExtendedPaymentMethod,
+        payment_method: PaymentMethodSchema,
         cardToken: z.string().startsWith('tkn_').optional(),
-        captureMode: z.enum(CaptureMethod).optional(),
+        captureMode: CaptureModeSchema.optional(),
         currency: z.string().length(3),
     });
 

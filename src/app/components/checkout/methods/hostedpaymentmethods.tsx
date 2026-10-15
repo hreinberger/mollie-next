@@ -14,12 +14,10 @@ export default async function HostedPaymentMethodCards({
 
     const methods = await mollieGetMethods(currency, country);
 
-    // Serialize to plain objects before crossing the Server/Client boundary.
-    // Mollie SDK returns class instances; only primitive fields can be passed as props.
-    const serialized = methods.map((m) => ({
-        id: m.id,
-        description: m.description,
-    }));
+    // Only pass the fields the client component needs across the boundary.
+    const serialized = methods.flatMap((m) =>
+        m.id ? [{ id: m.id, description: m.description }] : [],
+    );
 
     return <HostedPaymentMethodsInteractive methods={serialized} />;
 }

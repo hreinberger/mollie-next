@@ -13,6 +13,7 @@ import PaymentLogo from '@/app/components/checkout/paymentlogo';
 import {
     ALWAYS_AUTHORIZE_METHODS,
     OPTIONALLY_AUTHORIZE_METHODS,
+    type PaymentMethodType,
 } from '@/app/lib/types';
 
 type MethodShape = { id: string; description: string };
@@ -27,10 +28,10 @@ export default function HostedPaymentMethodsInteractive({
     );
 
     const isAlwaysAuthorize = ALWAYS_AUTHORIZE_METHODS.includes(
-        selectedMethod as any
+        selectedMethod as PaymentMethodType
     );
     const isOptionalAuthorize = OPTIONALLY_AUTHORIZE_METHODS.includes(
-        selectedMethod as any
+        selectedMethod as PaymentMethodType
     );
 
     return (

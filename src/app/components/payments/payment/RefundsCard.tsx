@@ -1,15 +1,10 @@
 import { Box, Card, Code, Flex, Heading, Separator, Table, Text, TextField } from '@radix-ui/themes';
+import type { ListRefundResponse } from 'mollie-api-typescript/models';
 import StateBadge from '../../shared/orderstatebadge';
 import SubmitButton from '../../shared/submitbutton';
-import { formatDateTime } from '@/app/lib/format';
+import { formatAmount, formatDateTime } from '@/app/lib/format';
 import { refundPayment } from '@/app/lib/payment-actions';
 
-type RefundRecord = {
-    id: string;
-    status: string;
-    amount: { value: string; currency: string };
-    createdAt: string;
-};
 
 export default function RefundsCard({
     id,
@@ -24,7 +19,7 @@ export default function RefundsCard({
     currency: string;
     remainingRefundable: string;
     canRefund: boolean;
-    refunds: RefundRecord[];
+    refunds: ListRefundResponse[];
 }) {
     const boundRefundPayment = refundPayment.bind(null, id, mode, remainingRefundable, currency);
 
@@ -54,7 +49,7 @@ export default function RefundsCard({
                                         </Code>
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {refund.amount.value} {refund.amount.currency}
+                                        {formatAmount(refund.amount)}
                                     </Table.Cell>
                                     <Table.Cell>
                                         <StateBadge state={refund.status} />

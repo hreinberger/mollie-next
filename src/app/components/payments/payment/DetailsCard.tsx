@@ -1,41 +1,17 @@
 import { Box, Card, Code, DataList, Flex, Heading, Table, Text } from '@radix-ui/themes';
-import { Payment } from '@mollie/api-client';
+import type { PaymentResponse } from 'mollie-api-typescript/models';
 import StateBadge from '../../shared/orderstatebadge';
 import PaymentLogo from '../../checkout/paymentlogo';
 import { formatDateTime } from '@/app/lib/format';
-
-type BillingAddress = {
-    givenName?: string;
-    familyName?: string;
-    organizationName?: string;
-    streetAndNumber?: string;
-    postalCode?: string;
-    city?: string;
-    country?: string;
-    email?: string;
-};
-
-type OrderLine = {
-    id?: string;
-    description: string;
-    quantity: number;
-    unitPrice: { value: string; currency: string };
-    totalAmount: { value: string; currency: string };
-};
 
 // The payment details card: core fields, billing address, metadata, and
 // order lines. The biggest single card on the payment detail page.
 export default function DetailsCard({
     payment,
-    billingAddress,
-    lines,
-    metadata,
 }: {
-    payment: Payment;
-    billingAddress?: BillingAddress;
-    lines?: OrderLine[];
-    metadata?: Record<string, unknown>;
+    payment: PaymentResponse;
 }) {
+    const { billingAddress, lines, metadata } = payment;
     const hasOrderLines = !!(lines && lines.length > 0);
 
     return (
@@ -167,7 +143,7 @@ export default function DetailsCard({
                                 </Table.Header>
                                 <Table.Body>
                                     {lines!.map((line, i) => (
-                                        <Table.Row key={line.id ?? i}>
+                                        <Table.Row key={i}>
                                             <Table.Cell>{line.description}</Table.Cell>
                                             <Table.Cell>{line.quantity}</Table.Cell>
                                             <Table.Cell>
