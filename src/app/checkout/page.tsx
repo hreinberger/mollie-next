@@ -51,9 +51,9 @@ export default async function Page(props: {
     const collectAddressViaSession = effectiveAddressSource === 'session';
 
     // Only create a Mollie session for @mollie.com users — it uses the live API key
-    let expressSession: ExpressSession = { id: '', clientAccessToken: '' };
+    let expressSession: ExpressSession | null = null;
     if (showComponents) {
-        const { sessionId, clientAccessToken } = await mollieCreateSession(
+        expressSession = await mollieCreateSession(
             validatedCurrency,
             collectAddressViaSession
                 ? ['email', 'billing-address', 'shipping-address']
@@ -62,7 +62,6 @@ export default async function Page(props: {
                 ? getFixedShippingOptions(validatedCurrency)
                 : undefined,
         );
-        expressSession = { id: sessionId, clientAccessToken };
     }
 
     return (

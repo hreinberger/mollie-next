@@ -10,7 +10,7 @@ import React from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 // Lib
-import { CheckoutVariant, AddressSource } from '@/app/lib/types';
+import { CheckoutVariant, AddressSource, ExpressSession } from '@/app/lib/types';
 
 // Client Components
 import CheckoutButton from './checkoutbutton';
@@ -32,10 +32,7 @@ export default function CheckoutForm({
 }: {
     address: React.ReactNode;
     hostedmethods: React.ReactNode;
-    session: {
-        id: string;
-        clientAccessToken: string;
-    };
+    session: ExpressSession | null;
     showComponents: boolean;
     addressSource: AddressSource;
 }) {
