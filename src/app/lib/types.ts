@@ -5,6 +5,7 @@ import {
     type EntityBalance,
     type EntityBalanceTransaction,
     type SessionRequestOption1,
+    type SessionResponse,
 } from 'mollie-api-typescript/models';
 import { z } from 'zod';
 
@@ -99,11 +100,11 @@ export type CheckoutVariant = 'hosted' | 'components' | 'components-v2';
 // Google Pay). See requiredCustomerDetails on mollieCreateSession.
 export type AddressSource = 'form' | 'session';
 
-// Express Session Type
-export type ExpressSession = {
-    id: string;
-    clientAccessToken: string;
-};
+// Express Session Type — the full Checkout Session response from
+// mollieCreateSession, which MollieV2Component uses for clientAccessToken
+// and SessionDetailsDialog uses to surface the rest (status, amount,
+// addresses, etc.) for debugging.
+export type ExpressSession = SessionResponse;
 
 // A selectable delivery option offered by the Express Checkout session when
 // address collection is delegated to Mollie. See shippingOptions on

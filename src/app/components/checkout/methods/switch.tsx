@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, SegmentedControl, Callout, Tabs } from '@radix-ui/themes';
+import { Box, Flex, SegmentedControl, Callout, Tabs } from '@radix-ui/themes';
 import { ExclamationTriangleIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 
 import React, { Suspense } from 'react';
@@ -10,7 +10,8 @@ import ComponentPaymentMethods from './componentpaymentmethods';
 import MollieV2Component from '@/app/components/checkout/methods/MollieV2Component';
 import AddressSourceToggle from '@/app/components/checkout/AddressSourceToggle';
 
-import { CheckoutVariant, AddressSource } from '@/app/lib/types';
+import { CheckoutVariant, AddressSource, ExpressSession } from '@/app/lib/types';
+import SessionDetailsDialog from './SessionDetailsDialog';
 
 export default function MethodSwitch({
     hostedmethods,
@@ -25,10 +26,7 @@ export default function MethodSwitch({
     hostedmethods: React.ReactNode;
     variant: CheckoutVariant;
     onVariantChange: (value: string) => void;
-    session: {
-        id: string;
-        clientAccessToken: string;
-    };
+    session: ExpressSession | null;
     showComponents: boolean;
     addressSource: AddressSource;
     onAddressSourceChange: (checked: boolean) => void;
@@ -125,16 +123,25 @@ export default function MethodSwitch({
                                         )
                                     }
                                 >
-                                    <Tabs.List>
+                                    <Tabs.List style={{ width: '100%' }}>
                                         {!addressCollectedBySession && (
-                                            <Tabs.Trigger value="methods">
+                                            <Tabs.Trigger
+                                                value="methods"
+                                                style={{ flex: 1 }}
+                                            >
                                                 Payment methods
                                             </Tabs.Trigger>
                                         )}
-                                        <Tabs.Trigger value="express">
+                                        <Tabs.Trigger
+                                            value="express"
+                                            style={{ flex: 1 }}
+                                        >
                                             Express Checkout
                                         </Tabs.Trigger>
-                                        <Tabs.Trigger value="card">
+                                        <Tabs.Trigger
+                                            value="card"
+                                            style={{ flex: 1 }}
+                                        >
                                             Card
                                         </Tabs.Trigger>
                                     </Tabs.List>
@@ -147,6 +154,11 @@ export default function MethodSwitch({
                                                     type="methods-component"
                                                     elementId="methods-component"
                                                 />
+                                                <Flex justify="center" mt="2">
+                                                    <SessionDetailsDialog
+                                                        session={session}
+                                                    />
+                                                </Flex>
                                             </Tabs.Content>
                                         )}
 
@@ -163,6 +175,11 @@ export default function MethodSwitch({
                                                 type="express-component"
                                                 elementId="express-component"
                                             />
+                                            <Flex justify="center" mt="2">
+                                                <SessionDetailsDialog
+                                                    session={session}
+                                                />
+                                            </Flex>
                                         </Tabs.Content>
 
                                         <Tabs.Content value="card">
@@ -171,6 +188,11 @@ export default function MethodSwitch({
                                                 type="card-component"
                                                 elementId="mollie-component"
                                             />
+                                            <Flex justify="center" mt="2">
+                                                <SessionDetailsDialog
+                                                    session={session}
+                                                />
+                                            </Flex>
                                         </Tabs.Content>
                                     </Box>
                                 </Tabs.Root>

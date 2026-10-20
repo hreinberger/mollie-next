@@ -315,10 +315,7 @@ export async function mollieCreateSession(
                 testmode: false,
             },
         });
-        return {
-            sessionId: session.id,
-            clientAccessToken: session.clientAccessToken,
-        };
+        return session;
     } catch (error) {
         console.error('Error creating Mollie session:', error);
         throw error;
